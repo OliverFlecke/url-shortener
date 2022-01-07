@@ -1,11 +1,10 @@
 import { ShortenerStore } from '.';
 import { logger } from '../container';
-import { UrlNotFoundError } from './errors';
 
 export default class InMemoryShortenerStore implements ShortenerStore {
 	data: { [key: string]: URL } = {};
 
-	lookup(key: string): Promise<URL> {
+	lookup(key: string): Promise<URL | undefined> {
 		logger.debug(`Looking up ${key}`);
 
 		if (key in this.data) {
@@ -15,11 +14,12 @@ export default class InMemoryShortenerStore implements ShortenerStore {
 			return Promise.resolve(url);
 		} else {
 			logger.warn(`Unable to find shorthand for ${key}`);
-			return Promise.reject(new UrlNotFoundError());
+			return Promise.resolve(undefined);
 		}
 	}
 
 	addRedirect(key: string, url: URL): Promise<void> {
+		logger.trace(`Adding mapping: '${key}' -> '${url}'`);
 		this.data[key] = url;
 
 		return Promise.resolve();

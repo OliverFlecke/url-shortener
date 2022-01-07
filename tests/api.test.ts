@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { URL } from 'url';
 import createApp from '../server/api';
+import { randomString } from './rand';
 
 describe('GET /s/', () => {
 	test('unable to find key', (done) => {
@@ -35,5 +36,16 @@ describe('POST /s/', () => {
 
 		expect(res.statusCode).toBe(200);
 		expect(await store.lookup(key)).toEqual(url);
+	});
+
+	test('without a body', async () => {
+		const { app, store } = createApp();
+		const key = randomString();
+
+		const res = await request(app).post(`/s/${key}`).send();
+
+		expect(res.statusCode).toBe(400);
+		expect(res.text).toEqual('Invalid URL');
+		expect(await store.lookup(key)).toEqual(undefined);
 	});
 });
