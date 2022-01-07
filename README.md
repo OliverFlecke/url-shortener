@@ -1,22 +1,19 @@
-# Custom server with TypeScript + Nodemon example
+# URL Shortener
 
-The example shows how you can use [TypeScript](https://typescriptlang.com) on both the server and the client while using [Nodemon](https://nodemon.io/) to live reload the server code without affecting the Next.js universal code.
+App to shorten URLs.
 
-Server entry point is `server/index.ts` in development and `dist/index.js` in production.
-The second directory should be added to `.gitignore`.
+## Development
 
-## Preview
+Use `yarn dev` to run the development server.
+This will start both the REST API, along with serving all the pages from NextJS.
 
-Preview the example live on [StackBlitz](http://stackblitz.com/):
+## Build
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/vercel/next.js/tree/canary/examples/custom-server-typescript)
+The project can be build with `yarn build`.
+As it requires a server, it can be executed with `yarn start`.
 
-## How to use
+## TODO
 
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init) or [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/) to bootstrap the example:
-
-```bash
-npx create-next-app --example custom-server-typescript custom-server-typescript-app
-# or
-yarn create next-app --example custom-server-typescript custom-server-typescript-app
-```
+- [ ] Enable configuration of data store for URLs
+- [ ] Add linting
+- [ ] Enable Docker support
