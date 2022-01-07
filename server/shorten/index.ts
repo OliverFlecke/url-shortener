@@ -5,15 +5,15 @@ const data: { [key: string]: string } = {
 };
 
 export function lookup(key: string): Promise<string> {
-	console.debug(`Looking up ${key}`);
+	// console.debug(`Looking up ${key}`);
 
 	if (key in data) {
 		const url = data[key];
-		console.debug(`Found mapping: '${key}' -> '${url}'`);
+		// console.debug(`Found mapping: '${key}' -> '${url}'`);
 
 		return Promise.resolve(url);
 	} else {
-		console.warn(`Unable to find shorthand for ${key}`);
+		// console.warn(`Unable to find shorthand for ${key}`);
 		return Promise.reject(new UrlNotFoundError());
 	}
 }
