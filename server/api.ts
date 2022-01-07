@@ -1,15 +1,16 @@
 import express, { Request, Response } from 'express';
-import configureContainer, { ContainerConfig, logger } from './container';
-import { addRedirect, lookup } from './shorten';
+import configureContainer, { Container, ContainerConfig, logger } from './container';
 import { UrlNotFoundError } from './shorten/errors';
 
 const app = express();
+let container: Container;
+
 app
 	.route('/s/:slug')
 	.get(async (req: Request, res: Response) => {
 		try {
-			const url = await lookup(req.params.slug);
-			res.redirect(url);
+			const url = await container.store.lookup(req.params.slug);
+			res.redirect(url.toString());
 		} catch (err) {
 			if (err instanceof UrlNotFoundError) {
 				res.sendStatus(404);
@@ -21,7 +22,7 @@ app
 	.post(async (req: Request, res: Response) => {
 		logger.debug(req.body);
 		const url = new URL(req.body);
-		await addRedirect(req.params.slug, url);
+		await container.store.addRedirect(req.params.slug, url);
 
 		res.sendStatus(200);
 	});
@@ -29,7 +30,7 @@ app
 interface ServerConfig extends ContainerConfig {}
 
 export default (config?: ServerConfig) => {
-	configureContainer(config);
+	container = configureContainer(config);
 
-	return app;
+	return { app, ...container };
 };
