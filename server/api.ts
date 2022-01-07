@@ -1,4 +1,5 @@
-import express, { Response, Request } from 'express';
+import express, { Request, Response } from 'express';
+import configureContainer, { ContainerConfig, logger } from './container';
 import { addRedirect, lookup } from './shorten';
 import { UrlNotFoundError } from './shorten/errors';
 
@@ -18,11 +19,17 @@ app
 		}
 	})
 	.post(async (req: Request, res: Response) => {
-		console.debug(req.body);
+		logger.debug(req.body);
 		const url = new URL(req.body);
 		await addRedirect(req.params.slug, url);
 
 		res.sendStatus(200);
 	});
 
-export default app;
+interface ServerConfig extends ContainerConfig {}
+
+export default (config?: ServerConfig) => {
+	configureContainer(config);
+
+	return app;
+};
