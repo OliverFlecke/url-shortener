@@ -5,7 +5,7 @@ import InMemoryShortenerStore from './shorten/InMemoryShortenerStore';
 export let logger: ILogger = console;
 
 export interface ContainerConfig {
-	logger?: ILogger;
+	logLevel?: LogLevel;
 }
 
 export interface Container {
@@ -14,7 +14,7 @@ export interface Container {
 }
 
 export default function (config?: ContainerConfig): Container {
-	logger = config?.logger ?? new ConsoleLogger(LogLevel.Debug);
+	logger = new ConsoleLogger(config?.logLevel ?? LogLevel.None);
 	const store = new InMemoryShortenerStore();
 
 	return { logger, store };

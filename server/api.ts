@@ -1,13 +1,18 @@
 import express, { Request, Response } from 'express';
 import configureContainer, { Container, ContainerConfig, logger } from './container';
 import { UrlNotFoundError } from './shorten/errors';
+import bodyParser from 'body-parser';
+
+let container: Container;
 
 const app = express();
-let container: Container;
+
+app.use(bodyParser.text());
 
 app
 	.route('/s/:slug')
 	.get(async (req: Request, res: Response) => {
+		logger.trace(`Getting url for '${req.params.slug}'`);
 		try {
 			const url = await container.store.lookup(req.params.slug);
 			res.redirect(url.toString());
@@ -20,7 +25,7 @@ app
 		}
 	})
 	.post(async (req: Request, res: Response) => {
-		logger.debug(req.body);
+		logger.trace(`Request to add '${req.params.slug}' -> '${req.body}'`);
 		const url = new URL(req.body);
 		await container.store.addRedirect(req.params.slug, url);
 
