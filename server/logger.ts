@@ -10,7 +10,7 @@ export enum LogLevel {
 	None = 0,
 	Error = 1,
 	Warn = 2,
-	Log = 3,
+	Info = 3,
 	Debug = 4,
 	Trace = 5,
 }
@@ -32,7 +32,7 @@ export class ConsoleLogger implements ILogger {
 			case LogLevel.Debug:
 				console.debug(`${timestamp}: [DBG] ${message}`);
 				break;
-			case LogLevel.Log:
+			case LogLevel.Info:
 				console.log(`${timestamp}: [INF] ${message}`);
 				break;
 			case LogLevel.Warn:
@@ -51,7 +51,7 @@ export class ConsoleLogger implements ILogger {
 		this.output(LogLevel.Debug, message);
 	}
 	log(message: string) {
-		this.output(LogLevel.Log, message);
+		this.output(LogLevel.Info, message);
 	}
 	warn(message: string) {
 		this.output(LogLevel.Warn, message);

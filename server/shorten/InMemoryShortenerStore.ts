@@ -5,11 +5,11 @@ export default class InMemoryShortenerStore implements ShortenerStore {
 	data: { [key: string]: URL } = {};
 
 	lookup(key: string): Promise<URL | undefined> {
-		logger.debug(`Looking up ${key}`);
+		logger.log(`Looking up ${key}`);
 
 		if (key in this.data) {
 			const url = this.data[key];
-			logger.debug(`Found mapping: '${key}' -> '${url}'`);
+			logger.trace(`Found mapping: '${key}' -> '${url}'`);
 
 			return Promise.resolve(url);
 		} else {
@@ -19,7 +19,7 @@ export default class InMemoryShortenerStore implements ShortenerStore {
 	}
 
 	addRedirect(key: string, url: URL): Promise<void> {
-		logger.trace(`Adding mapping: '${key}' -> '${url}'`);
+		logger.log(`Adding mapping: '${key}' -> '${url}'`);
 		this.data[key] = url;
 
 		return Promise.resolve();

@@ -1,18 +1,22 @@
-import Link from 'next/link'
+import AddUrl from '../src/components/AddUrl';
+import ShortenedUrlList from '../src/components/ShortenedUrlList';
 
 export default function Home() {
-  return (
-    <ul>
-      <li>
-        <Link href="/a" as="/a">
-          <a>a</a>
-        </Link>
-      </li>
-      <li>
-        <Link href="/b" as="/b">
-          <a>b</a>
-        </Link>
-      </li>
-    </ul>
-  )
+	return (
+		<div>
+			<AddUrl />
+			<ShortenedUrlList
+				urls={[
+					{
+						name: 'abc',
+						url: new URL('https://abc.com'),
+					},
+					{
+						name: 'xyz',
+						url: new URL('https://xyz.com'),
+					},
+				]}
+			/>
+		</div>
+	);
 }
