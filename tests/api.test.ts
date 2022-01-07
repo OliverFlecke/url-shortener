@@ -48,4 +48,16 @@ describe('POST /s/', () => {
 		expect(res.text).toEqual('Invalid URL');
 		expect(await store.lookup(key)).toEqual(undefined);
 	});
+
+	test('with a body, but which is not a valid URI', async () => {
+		const { app, store } = createApp();
+		const key = randomString();
+		const url = randomString(32);
+
+		const res = await request(app).post(`/s/${key}`).set('Content-Type', 'text/plain').send(url);
+
+		expect(res.statusCode).toEqual(400);
+		expect(res.text).toEqual('Invalid URL');
+		expect(await store.lookup(key)).toEqual(undefined);
+	});
 });
