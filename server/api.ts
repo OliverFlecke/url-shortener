@@ -1,6 +1,10 @@
 import bodyParser from 'body-parser';
 import express, { Request, Response } from 'express';
-import configureContainer, { Container, ContainerConfig, logger } from './container';
+import configureContainer, {
+	Container,
+	ContainerConfig,
+	logger,
+} from './container';
 
 let container: Container;
 

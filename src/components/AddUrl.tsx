@@ -1,6 +1,13 @@
 import React, { useCallback, useRef } from 'react';
 
-const AddUrl: React.FC = () => {
+async function saveUrl(url: URL, key?: string): Promise<void> {
+	await fetch(`s/${key ?? 'aaa'}`, {
+		method: 'POST',
+		body: url.toString(),
+	});
+}
+
+function AddUrl() {
 	const urlInputRef = useRef<HTMLInputElement>(null);
 	const nameInputRef = useRef<HTMLInputElement>(null);
 
@@ -9,7 +16,10 @@ const AddUrl: React.FC = () => {
 		if (input && input.value !== '') {
 			try {
 				const url = new URL(input.value);
-				const key = nameInputRef.current?.value === '' ? undefined : nameInputRef.current?.value;
+				const key =
+					nameInputRef.current?.value === ''
+						? undefined
+						: nameInputRef.current?.value;
 
 				await saveUrl(url, key);
 				input.value = '';
@@ -17,7 +27,7 @@ const AddUrl: React.FC = () => {
 				alert('You did not provide a valid url');
 			}
 		}
-	}, [urlInputRef, nameInputRef]);
+	}, []);
 
 	const handleKeyPress = useCallback(
 		(e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -39,18 +49,11 @@ const AddUrl: React.FC = () => {
 				<span>URL</span>
 				<input ref={urlInputRef} onKeyPress={handleKeyPress} />
 			</label>
-			<button type='button' onClick={onAdd}>
+			<button type="button" onClick={onAdd}>
 				Add
 			</button>
 		</div>
 	);
-};
+}
 
 export default AddUrl;
-
-async function saveUrl(url: URL, key?: string): Promise<void> {
-	await fetch(`s/${key ?? 'aaa'}`, {
-		method: 'POST',
-		body: url.toString(),
-	});
-}

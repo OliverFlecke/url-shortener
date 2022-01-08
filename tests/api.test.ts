@@ -54,7 +54,10 @@ describe('POST /s/', () => {
 		const key = randomString();
 		const url = randomString(32);
 
-		const res = await request(app).post(`/s/${key}`).set('Content-Type', 'text/plain').send(url);
+		const res = await request(app)
+			.post(`/s/${key}`)
+			.set('Content-Type', 'text/plain')
+			.send(url);
 
 		expect(res.statusCode).toEqual(400);
 		expect(res.text).toEqual('Invalid URL');

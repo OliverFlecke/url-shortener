@@ -47,15 +47,19 @@ export class ConsoleLogger implements ILogger {
 	trace(message: string) {
 		this.output(LogLevel.Trace, message);
 	}
+
 	debug(message: string) {
 		this.output(LogLevel.Debug, message);
 	}
+
 	log(message: string) {
 		this.output(LogLevel.Info, message);
 	}
+
 	warn(message: string) {
 		this.output(LogLevel.Warn, message);
 	}
+
 	error(message: string) {
 		this.output(LogLevel.Error, message);
 	}
