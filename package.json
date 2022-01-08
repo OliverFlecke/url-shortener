@@ -1,13 +1,18 @@
 {
-	"private": true,
+	"name": "url-shorten",
+	"author": "Oliver Fleckenstein",
+	"homepage": "https://github.com/OliverFlecke/url-shortener",
+	"main": "server/index.js",
+	"private": false,
 	"scripts": {
 		"test": "jest",
 		"lint": "yarn run eslint . --fix && yarn prettier . --write",
 		"css": "cross-env TAILWIND_MODE=watch yarn postcss src/main.css -o src/compiled.css -v --watch",
 		"dev:js": "nodemon",
 		"dev": "concurrently --kill-others --names \"JS,CSS\" -c \"bgBlue.bold,bgGreen.bold\" \"yarn dev:js\" \"yarn css\"",
-		"build": "next build && tsc --project tsconfig.server.json",
-		"start": "cross-env NODE_ENV=production node dist/index.js",
+		"build:css": "yarn postcss src/main.css -o src/compiled.css -v",
+		"build": "yarn build:css && next build && tsc --project tsconfig.server.json",
+		"start": "cross-env NODE_ENV=production node dist/server/index.js",
 		"prepare": "husky install"
 	},
 	"dependencies": {
