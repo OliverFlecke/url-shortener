@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import AddUrlForm from '../src/components/AddUrlForm';
 import ShortenedUrlList, {
 	ShortenedUrlListFuncs,
@@ -6,10 +6,14 @@ import ShortenedUrlList, {
 
 export default function Home() {
 	const listRef = useRef<ShortenedUrlListFuncs>(null);
+	const refresh = useCallback(
+		() => listRef.current?.refresh() ?? Promise.resolve(),
+		[]
+	);
 
 	return (
 		<>
-			<AddUrlForm refresh={listRef.current?.refresh} />
+			<AddUrlForm refresh={refresh} />
 			<ShortenedUrlList ref={listRef} />
 		</>
 	);
