@@ -1,3 +1,4 @@
+import { arrowForward, copy } from 'ionicons/icons';
 import React, {
 	forwardRef,
 	useCallback,
@@ -6,6 +7,7 @@ import React, {
 	useState,
 } from 'react';
 import ShortenedUrl from '../models/ShortenedUrl';
+import Icon from './Icon';
 
 /**
  * Pure component to render a list of shortened URLs.
@@ -28,16 +30,33 @@ const NoLinks: React.FC = () => (
 const List: React.FC<{ urls: ShortenedUrl[] }> = ({ urls }) => (
 	<ul className="rounded-md mt-2 p-4 space-y-4 bg-gray-700">
 		{urls.map((x) => (
-			<li
-				key={x.name}
-				className="rounded-md bg-green-800 p-4 flex justify-between"
-			>
-				<span>{x.name}</span>
-				<a href={x.url.toString()}>{x.url.toString()}</a>
-			</li>
+			<UrlRow key={x.name} url={x} />
 		))}
 	</ul>
 );
+
+const UrlRow: React.FC<{ url: ShortenedUrl }> = ({ url }) => {
+	const shortUrl = `${window.location.origin}/${url.name}`;
+	const copyUrl = useCallback(
+		() => navigator.clipboard.writeText(shortUrl),
+		[shortUrl]
+	);
+
+	return (
+		<li className="rounded-md bg-green-800 p-4 flex justify-between items-center">
+			<span className="flex space-x-2">
+				<span>{shortUrl}</span>
+				<button onClick={copyUrl} className="flex items-center">
+					<Icon icon={copy} />
+				</button>
+			</span>
+			<Icon icon={arrowForward} />
+			<a href={url.url.toString()} className="underline">
+				{url.url.toString()}
+			</a>
+		</li>
+	);
+};
 
 /**
  * Component to render the list of shortened urls.

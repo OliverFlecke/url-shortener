@@ -10,6 +10,13 @@
 	@apply text-gray-700 dark:text-gray-400;
 }
 
+.ionicon {
+	@apply fill-current stroke-current;
+}
+.ionicon-fill-none {
+	fill: none;
+}
+
 button.btn {
 	@apply rounded-md py-2 px-6 bg-indigo-700 text-white;
 }

@@ -13,19 +13,19 @@ const Layout = function ({ Component, pageProps }: AppProps) {
 				<meta
 					name="theme-color"
 					media="(prefers-color-scheme: light)"
-					content="#FFF"
+					content="#0284c7"
 				/>
 				<meta
 					name="theme-color"
 					media="(prefers-color-scheme: dark)"
-					content="#000"
+					content="#0c4a6e"
 				/>
 				<meta name="description" content="URL Shortener" />
 				<link rel="apple-touch-icon" href="/logo192.png" />
 				{/* <link rel="manifest" href="/manifest.json" /> */}
 				<meta name="color-scheme" content="dark light" />
 			</Head>
-			<main className="min-h-screen h-full bg-gradient-to-br dark:to-gray-900 dark:from-sky-900 from-gray-100 to-sky-600">
+			<main className="min-h-screen h-full bg-gradient-to-b dark:to-gray-900 dark:from-sky-900 from-gray-100 to-sky-600">
 				<Component {...pageProps} />
 			</main>
 		</>
