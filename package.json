@@ -3,7 +3,9 @@
 	"scripts": {
 		"test": "jest",
 		"lint": "yarn run eslint . --fix && yarn prettier . --write",
-		"dev": "nodemon",
+		"css": "cross-env TAILWIND_MODE=watch yarn postcss src/main.css -o src/compiled.css -v --watch",
+		"dev:js": "nodemon",
+		"dev": "concurrently --kill-others --names \"JS,CSS\" -c \"bgBlue.bold,bgGreen.bold\" \"yarn dev:js\" \"yarn css\"",
 		"build": "next build && tsc --project tsconfig.server.json",
 		"start": "cross-env NODE_ENV=production node dist/index.js",
 		"prepare": "husky install"
@@ -24,6 +26,9 @@
 		"@types/supertest": "^2.0.11",
 		"@typescript-eslint/eslint-plugin": "^5.9.0",
 		"@typescript-eslint/parser": "^5.9.0",
+		"autoprefixer": "^10.4.2",
+		"concurrently": "^7.0.0",
+		"cssnano": "^5.0.15",
 		"eslint": "^8.6.0",
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-plugin-import": "^2.25.4",
@@ -34,8 +39,12 @@
 		"jest": "^27.4.7",
 		"lint-staged": "^12.1.7",
 		"nodemon": "^2.0.4",
+		"postcss": "^8.4.5",
+		"postcss-cli": "^9.1.0",
+		"postcss-import": "^14.0.2",
 		"prettier": "^2.5.1",
 		"supertest": "^6.1.6",
+		"tailwindcss": "^3.0.12",
 		"ts-node": "^8.10.2",
 		"typescript": "4.5.4"
 	},
