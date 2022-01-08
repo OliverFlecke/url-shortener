@@ -7,11 +7,11 @@ button.btn {
 }
 
 label.styled {
-	@apply flex flex-col justify-between w-full py-4 space-y-2;
+	@apply flex flex-col justify-between w-full py-2 space-y-2;
 	@apply sm:flex-row sm:items-center sm:max-w-lg;
 
 	input {
-		@apply rounded-md p-2  w-full sm:max-w-sm;
+		@apply rounded-md p-2 w-full sm:max-w-sm;
 	}
 
 	span {

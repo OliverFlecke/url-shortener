@@ -40,9 +40,7 @@ function AddUrl() {
 
 	return (
 		<div className="flex flex-col items-center px-4">
-			<h2 className="pt-4 text-center text-3xl md:text-4xl">
-				Create shortened URL
-			</h2>
+			<h2 className="pt-4 text-center text-3xl md:text-4xl">Shorten URL</h2>
 			<label className="styled">
 				<span>Short name</span>
 				<input
@@ -59,7 +57,11 @@ function AddUrl() {
 					placeholder="URL to shorten"
 				/>
 			</label>
-			<button onClick={onAdd} type="button" className="btn">
+			<button
+				onClick={onAdd}
+				type="button"
+				className="btn w-full sm:w-auto mt-2"
+			>
 				Add
 			</button>
 		</div>
