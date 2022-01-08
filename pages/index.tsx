@@ -1,23 +1,16 @@
-import React from 'react';
-import AddUrl from '../src/components/AddUrl';
-import ShortenedUrlList from '../src/components/ShortenedUrlList';
+import React, { useRef } from 'react';
+import AddUrlForm from '../src/components/AddUrlForm';
+import ShortenedUrlList, {
+	ShortenedUrlListFuncs,
+} from '../src/components/ShortenedUrlList';
 
 export default function Home() {
+	const listRef = useRef<ShortenedUrlListFuncs>(null);
+
 	return (
 		<>
-			<AddUrl />
-			<ShortenedUrlList
-				urls={[
-					{
-						name: 'abc',
-						url: new URL('https://abc.com'),
-					},
-					{
-						name: 'xyz',
-						url: new URL('https://xyz.com'),
-					},
-				]}
-			/>
+			<AddUrlForm refresh={listRef.current?.refresh} />
+			<ShortenedUrlList ref={listRef} />
 		</>
 	);
 }

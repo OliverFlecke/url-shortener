@@ -7,7 +7,9 @@ async function saveUrl(url: URL, key?: string): Promise<void> {
 	});
 }
 
-function AddUrl() {
+const AddUrlForm: React.FC<{ refresh?: () => Promise<void> }> = ({
+	refresh,
+}) => {
 	const urlInputRef = useRef<HTMLInputElement>(null);
 	const nameInputRef = useRef<HTMLInputElement>(null);
 
@@ -22,12 +24,18 @@ function AddUrl() {
 						: nameInputRef.current?.value;
 
 				await saveUrl(url, key);
+				refresh?.();
+
 				input.value = '';
-			} catch {
+				if (nameInputRef.current) {
+					nameInputRef.current.value = '';
+				}
+			} catch (err) {
+				console.error(err);
 				alert('You did not provide a valid url');
 			}
 		}
-	}, []);
+	}, [refresh]);
 
 	const handleKeyPress = useCallback(
 		(e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -46,7 +54,7 @@ function AddUrl() {
 				<input
 					ref={nameInputRef}
 					onKeyPress={handleKeyPress}
-					placeholder="Custom short name"
+					placeholder="(Optional) Custom short name"
 				/>
 			</label>
 			<label className="styled">
@@ -66,6 +74,6 @@ function AddUrl() {
 			</button>
 		</div>
 	);
-}
+};
 
-export default AddUrl;
+export default AddUrlForm;
