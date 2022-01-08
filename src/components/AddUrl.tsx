@@ -39,17 +39,27 @@ function AddUrl() {
 	);
 
 	return (
-		<div>
-			<h2>Create shortened URL</h2>
-			<label>
+		<div className="flex flex-col items-center px-4">
+			<h2 className="pt-4 text-center text-3xl md:text-4xl">
+				Create shortened URL
+			</h2>
+			<label className="styled">
 				<span>Short name</span>
-				<input ref={nameInputRef} onKeyPress={handleKeyPress} />
+				<input
+					ref={nameInputRef}
+					onKeyPress={handleKeyPress}
+					placeholder="Custom short name"
+				/>
 			</label>
-			<label>
+			<label className="styled">
 				<span>URL</span>
-				<input ref={urlInputRef} onKeyPress={handleKeyPress} />
+				<input
+					ref={urlInputRef}
+					onKeyPress={handleKeyPress}
+					placeholder="URL to shorten"
+				/>
 			</label>
-			<button type="button" onClick={onAdd}>
+			<button onClick={onAdd} type="button" className="btn">
 				Add
 			</button>
 		</div>

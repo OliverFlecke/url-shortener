@@ -4,7 +4,7 @@ import ShortenedUrlList from '../src/components/ShortenedUrlList';
 
 export default function Home() {
 	return (
-		<div>
+		<>
 			<AddUrl />
 			<ShortenedUrlList
 				urls={[
@@ -18,6 +18,6 @@ export default function Home() {
 					},
 				]}
 			/>
-		</div>
+		</>
 	);
 }
