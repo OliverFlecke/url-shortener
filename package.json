@@ -3,6 +3,7 @@
 	"author": "Oliver Fleckenstein",
 	"homepage": "https://github.com/OliverFlecke/url-shortener",
 	"main": "server/index.js",
+	"license": "MIT",
 	"private": false,
 	"scripts": {
 		"test": "jest",

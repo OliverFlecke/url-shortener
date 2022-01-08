@@ -22,10 +22,10 @@ const Layout = function ({ Component, pageProps }: AppProps) {
 				/>
 				<meta name="description" content="URL Shortener" />
 				<link rel="apple-touch-icon" href="/logo192.png" />
-				<link rel="manifest" href="/manifest.json" />
+				{/* <link rel="manifest" href="/manifest.json" /> */}
 				<meta name="color-scheme" content="dark light" />
 			</Head>
-			<main className="min-h-screen h-full bg-gradient-to-b dark:from-gray-900 dark:to-fuchsia-900 from-gray-100 to-fuchsia-600">
+			<main className="min-h-screen h-full bg-gradient-to-br dark:to-gray-900 dark:from-sky-900 from-gray-100 to-sky-600">
 				<Component {...pageProps} />
 			</main>
 		</>
