@@ -1,10 +1,6 @@
 import React from 'react';
+import ShortenedUrl from '../models/ShortenedUrl';
 
-interface ShortenedUrl {
-	name: string;
-	url: URL;
-	// createdOn: Date;
-}
 interface ShortenedUrlListProps {
 	urls: ShortenedUrl[];
 }

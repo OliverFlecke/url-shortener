@@ -40,6 +40,16 @@ app
 		}
 	});
 
+app.route('/s/').get(async (_: Request, res: Response) => {
+	const urls = await container.store.get();
+
+	if (urls.length === 0) {
+		res.sendStatus(204);
+	} else {
+		res.json(urls);
+	}
+});
+
 interface ServerConfig extends ContainerConfig {}
 
 export default (config?: ServerConfig) => {

@@ -1,9 +1,9 @@
 export interface ILogger {
-	trace: (message: string) => void;
-	debug: (message: string) => void;
-	log: (message: string) => void;
-	warn: (message: string) => void;
-	error: (message: string) => void;
+	trace: (message: any) => void;
+	debug: (message: any) => void;
+	log: (message: any) => void;
+	warn: (message: any) => void;
+	error: (message: any) => void;
 }
 
 export enum LogLevel {
@@ -21,7 +21,7 @@ export class ConsoleLogger implements ILogger {
 		this.level = level ?? LogLevel.Debug;
 	}
 
-	private output(level: LogLevel, message: string) {
+	private output(level: LogLevel, message: any) {
 		if (level > this.level) return;
 
 		const timestamp = new Date(Date.now()).toISOString();
@@ -44,23 +44,23 @@ export class ConsoleLogger implements ILogger {
 		}
 	}
 
-	trace(message: string) {
+	trace(message: any) {
 		this.output(LogLevel.Trace, message);
 	}
 
-	debug(message: string) {
+	debug(message: any) {
 		this.output(LogLevel.Debug, message);
 	}
 
-	log(message: string) {
+	log(message: any) {
 		this.output(LogLevel.Info, message);
 	}
 
-	warn(message: string) {
+	warn(message: any) {
 		this.output(LogLevel.Warn, message);
 	}
 
-	error(message: string) {
+	error(message: any) {
 		this.output(LogLevel.Error, message);
 	}
 }
