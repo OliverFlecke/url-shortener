@@ -19,7 +19,7 @@ app
 
 		const url = await container.store.lookup(req.params.slug);
 		if (url) {
-			res.redirect(url.toString());
+			res.redirect(url.url.toString());
 		} else {
 			res.sendStatus(404);
 		}
@@ -52,8 +52,8 @@ app.route('/s/').get(async (_: Request, res: Response) => {
 
 interface ServerConfig extends ContainerConfig {}
 
-export default (config?: ServerConfig) => {
-	container = configureContainer(config);
+export default async (config?: ServerConfig) => {
+	container = await configureContainer(config);
 
 	return { app, ...container };
 };

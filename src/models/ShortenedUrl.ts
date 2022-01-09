@@ -1,6 +1,6 @@
 export default interface ShortenedUrl {
 	name: string;
-	url: URL;
+	url: string;
 	createdOn: Date;
 	expiresOn?: Date;
 	userId?: number;

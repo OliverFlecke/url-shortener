@@ -16,7 +16,7 @@ export default class InMemoryShortenerStore implements ShortenerStore {
 		return Promise.resolve(urls);
 	}
 
-	lookup(key: string): Promise<ShortenedUrl | undefined> {
+	lookup(key: string): Promise<ShortenedUrl | null> {
 		logger.log(`Looking up ${key}`);
 
 		if (key in this.data) {
@@ -26,13 +26,17 @@ export default class InMemoryShortenerStore implements ShortenerStore {
 			return Promise.resolve(url);
 		} else {
 			logger.warn(`Unable to find shorthand for ${key}`);
-			return Promise.resolve(undefined);
+			return Promise.resolve(null);
 		}
 	}
 
 	addRedirect(key: string, url: URL): Promise<void> {
 		logger.log(`Adding mapping: '${key}' -> '${url}'`);
-		this.data[key] = { name: key, url, createdOn: new Date(Date.now()) };
+		this.data[key] = {
+			name: key,
+			url: url.toString(),
+			createdOn: new Date(Date.now()),
+		};
 
 		return Promise.resolve();
 	}
