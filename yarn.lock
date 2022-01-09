@@ -923,6 +923,11 @@
   dependencies:
     "@types/superagent" "*"
 
+"@types/tailwindcss@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@types/tailwindcss/-/tailwindcss-3.0.2.tgz#ca443a523a033d27f5f1040b31f7d11953e18d9e"
+  integrity sha512-4nilb5vk7aZXaQvMZin5dSHX+AIHZNDmKtDDRHfVKE/XNkQK9OjZ9V+zo+XHoH/fdLzureJno3+C5wIGdrBzgQ==
+
 "@types/yargs-parser@*":
   version "20.2.1"
   resolved "https://registry.npmjs.org/@types/yargs-parser/-/yargs-parser-20.2.1.tgz"

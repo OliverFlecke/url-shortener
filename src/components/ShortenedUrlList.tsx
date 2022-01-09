@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import ShortenedUrl from '../models/ShortenedUrl';
 import Icon from './Icon';
+import Tooltip from './Tooltip';
 
 /**
  * Pure component to render a list of shortened URLs.
@@ -47,7 +48,10 @@ const UrlRow: React.FC<{ url: ShortenedUrl }> = ({ url }) => {
 			<span className="flex space-x-2">
 				<span>{shortUrl}</span>
 				<button onClick={copyUrl} className="flex items-center">
-					<Icon icon={copy} />
+					<Tooltip>
+						<Icon icon={copy} />
+						<Tooltip.Text>Copy to clipboard</Tooltip.Text>
+					</Tooltip>
 				</button>
 			</span>
 			<Icon icon={arrowForward} />

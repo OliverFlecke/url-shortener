@@ -2,6 +2,7 @@ import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import React from 'react';
 import 'src/compiled.css';
+import { sky } from 'tailwindcss/colors';
 
 const Layout = function ({ Component, pageProps }: AppProps) {
 	return (
@@ -13,12 +14,12 @@ const Layout = function ({ Component, pageProps }: AppProps) {
 				<meta
 					name="theme-color"
 					media="(prefers-color-scheme: light)"
-					content="#0284c7"
+					content={sky[600]}
 				/>
 				<meta
 					name="theme-color"
 					media="(prefers-color-scheme: dark)"
-					content="#0c4a6e"
+					content={sky[900]}
 				/>
 				<meta name="description" content="URL Shortener" />
 				<link rel="apple-touch-icon" href="/logo192.png" />
