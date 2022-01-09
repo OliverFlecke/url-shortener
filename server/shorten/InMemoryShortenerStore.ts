@@ -3,18 +3,20 @@ import ShortenedUrl from '../../src/models/ShortenedUrl';
 import { logger } from '../container';
 
 export default class InMemoryShortenerStore implements ShortenerStore {
-	data: { [key: string]: URL } = {};
+	data: { [key: string]: ShortenedUrl } = {};
 
 	get(): Promise<ShortenedUrl[]> {
-		const urls = Object.keys(this.data).map((key) => ({
-			name: key,
-			url: this.data[key],
-		}));
+		const urls = Object.values(this.data)
+			.sort(
+				(a: ShortenedUrl, b: ShortenedUrl) =>
+					a.createdOn.getTime() - b.createdOn.getTime()
+			)
+			.slice(0, 50);
 
 		return Promise.resolve(urls);
 	}
 
-	lookup(key: string): Promise<URL | undefined> {
+	lookup(key: string): Promise<ShortenedUrl | undefined> {
 		logger.log(`Looking up ${key}`);
 
 		if (key in this.data) {
@@ -30,7 +32,7 @@ export default class InMemoryShortenerStore implements ShortenerStore {
 
 	addRedirect(key: string, url: URL): Promise<void> {
 		logger.log(`Adding mapping: '${key}' -> '${url}'`);
-		this.data[key] = url;
+		this.data[key] = { name: key, url, createdOn: new Date(Date.now()) };
 
 		return Promise.resolve();
 	}
