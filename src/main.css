@@ -35,7 +35,7 @@ label.styled {
 }
 
 .tooltip-content {
-	@apply absolute z-10 w-screen max-w-max;
+	@apply absolute z-10 max-w-max;
 	@apply invisible opacity-0 group-hover:visible group-hover:opacity-100;
 	@apply p-2 px-4 rounded-md bg-gray-100 dark:bg-gray-800;
 	@apply -translate-x-1/2 translate-y-1/2 top-1/2 left-1/2;
