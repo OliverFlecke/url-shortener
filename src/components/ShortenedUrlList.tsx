@@ -1,4 +1,4 @@
-import { arrowForward, copy } from 'ionicons/icons';
+import { arrowDown, copy } from 'ionicons/icons';
 import React, {
 	forwardRef,
 	useCallback,
@@ -29,7 +29,7 @@ const NoLinks: React.FC = () => (
 );
 
 const List: React.FC<{ urls: ShortenedUrl[] }> = ({ urls }) => (
-	<ul className="rounded-md mt-2 p-4 space-y-4 bg-gray-700">
+	<ul className="rounded-md mt-2 space-y-4">
 		{urls.map((x) => (
 			<UrlRow key={x.name} url={x} />
 		))}
@@ -37,15 +37,15 @@ const List: React.FC<{ urls: ShortenedUrl[] }> = ({ urls }) => (
 );
 
 const UrlRow: React.FC<{ url: ShortenedUrl }> = ({ url }) => {
-	const shortUrl = `${window.location.origin}/${url.name}`;
+	const shortUrl = `${window.location.origin}/s/${url.name}`;
 	const copyUrl = useCallback(
 		() => navigator.clipboard.writeText(shortUrl),
 		[shortUrl]
 	);
 
 	return (
-		<li className="rounded-md bg-green-800 p-4 flex justify-between items-center">
-			<span className="flex space-x-2">
+		<li className="rounded-md bg-green-800 p-4 flex flex-col justify-between items-center">
+			<span className="flex w-full justify-between space-x-2 sm:w-auto">
 				<span>{shortUrl}</span>
 				<button onClick={copyUrl} className="flex items-center">
 					<Tooltip>
@@ -54,8 +54,8 @@ const UrlRow: React.FC<{ url: ShortenedUrl }> = ({ url }) => {
 					</Tooltip>
 				</button>
 			</span>
-			<Icon icon={arrowForward} />
-			<a href={url.url.toString()} className="underline">
+			<Icon icon={arrowDown} />
+			<a href={url.url.toString()} className="underline text-sky-300">
 				{url.url.toString()}
 			</a>
 		</li>
