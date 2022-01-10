@@ -66,6 +66,25 @@ describe('POST /s/', () => {
 		expect(res.text).toEqual('Invalid URL');
 		expect(await store.lookup(key)).toEqual(null);
 	});
+
+	test('without a provided name should generate random', async () => {
+		const { app, store } = await createApp();
+		const url = new URL('https://example.com');
+
+		const res = await request(app)
+			.post('/s/')
+			.set('Content-Type', 'text/plain')
+			.send(url.toString())
+			.expect(200);
+
+		expect(res.text).not.toBeNull();
+		const name = JSON.parse(res.text).name;
+		expect(await store.lookup(name)).toEqual({
+			name: name,
+			url: url.toString(),
+			createdOn: expect.any(Date),
+		});
+	});
 });
 
 describe('GET /s/', () => {

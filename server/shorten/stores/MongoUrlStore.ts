@@ -49,7 +49,7 @@ export default class MongoUrlStore implements ShortenerStore {
 		return Promise.resolve(url);
 	}
 
-	async addRedirect(key: string, url: URL): Promise<void> {
+	async addRedirect(key: string, url: URL): Promise<ShortenedUrl> {
 		const entry: ShortenedUrl = {
 			name: key,
 			url: url.toString(),
@@ -57,6 +57,6 @@ export default class MongoUrlStore implements ShortenerStore {
 		};
 		await this.urls.insertOne(entry);
 
-		return Promise.resolve();
+		return Promise.resolve(entry);
 	}
 }

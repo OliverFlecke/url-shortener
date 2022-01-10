@@ -40,4 +40,5 @@ The default configuration is:
 
 - [x] Enable configuration of data store for URLs
 - [x] Add linting
-- [x] Enable Docker support
+- [x] Enable Docker support + docker compose
+- [ ] Analytics for how often an url is visited

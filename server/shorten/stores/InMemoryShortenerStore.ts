@@ -35,14 +35,15 @@ export default class InMemoryShortenerStore implements ShortenerStore {
 		}
 	}
 
-	addRedirect(key: string, url: URL): Promise<void> {
+	addRedirect(key: string, url: URL): Promise<ShortenedUrl> {
 		logger.log(`Adding mapping: '${key}' -> '${url}'`);
-		this.data[key] = {
+		const entry = {
 			name: key,
 			url: url.toString(),
 			createdOn: new Date(Date.now()),
 		};
+		this.data[key] = entry;
 
-		return Promise.resolve();
+		return Promise.resolve(entry);
 	}
 }
