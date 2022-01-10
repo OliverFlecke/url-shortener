@@ -50,9 +50,7 @@ app.route('/s/').get(async (_: Request, res: Response) => {
 	}
 });
 
-interface ServerConfig extends ContainerConfig {}
-
-export default async (config?: ServerConfig) => {
+export default async (config?: ContainerConfig) => {
 	container = await configureContainer(config);
 
 	return { app, ...container };

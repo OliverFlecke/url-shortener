@@ -1,7 +1,7 @@
 import { createServer } from 'http';
 import next from 'next';
 import createApp from './api';
-import { LogLevel } from './logger';
+import { parseConfig } from './configParser';
 
 const port = parseInt(process.env.PORT || '3000');
 const dev = process.env.NODE_ENV !== 'production';
@@ -10,10 +10,7 @@ const nextHandler = nextApp.getRequestHandler();
 
 nextApp.prepare().then(async () => {
 	try {
-		const { app, logger } = await createApp({
-			logLevel: LogLevel.Info,
-			storeType: 'MongoDB',
-		});
+		const { app, logger } = await createApp(parseConfig(process.env));
 
 		app.all('*', (req, res) => nextHandler(req, res));
 

@@ -9,7 +9,7 @@
 		"test": "jest",
 		"lint": "yarn run eslint . --fix && yarn prettier . --write",
 		"css": "cross-env TAILWIND_MODE=watch yarn postcss src/main.css -o src/compiled.css -v --watch",
-		"dev:js": "nodemon",
+		"dev:js": "cross-env LOG_LEVEL=debug nodemon",
 		"dev": "concurrently --kill-others --names \"JS,CSS\" -c \"bgBlue.bold,bgGreen.bold\" \"yarn dev:js\" \"yarn css\"",
 		"build:css": "yarn postcss src/main.css -o src/compiled.css -v",
 		"build": "yarn build:css && next build && tsc --project tsconfig.server.json",

@@ -1,0 +1,17 @@
+version: '3.9'
+services:
+  mongo:
+    image: mongo:latest
+    restart: always
+    volumes:
+      - mongodb:/data/db
+  web:
+    depends_on:
+      - mongo
+    build: .
+    ports:
+      - 3000:3000
+    environment:
+      - DB_HOST=mongo
+volumes:
+  mongodb: null

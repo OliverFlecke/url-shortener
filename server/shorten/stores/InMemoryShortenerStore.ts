@@ -1,6 +1,11 @@
-import { ShortenerStore } from '.';
-import ShortenedUrl from '../../src/models/ShortenedUrl';
-import { logger } from '../container';
+import { ShortenerStore } from '..';
+import ShortenedUrl from '../../../src/models/ShortenedUrl';
+import { logger } from '../../container';
+import DbStore from './DbStore';
+
+export interface InMemoryConfig extends DbStore {
+	type: 'In memory';
+}
 
 export default class InMemoryShortenerStore implements ShortenerStore {
 	data: { [key: string]: ShortenedUrl } = {};

@@ -1,13 +1,15 @@
 import { ConsoleLogger, ILogger, LogLevel } from './logger';
 import { ShortenerStore } from './shorten';
-import InMemoryShortenerStore from './shorten/InMemoryShortenerStore';
-import MongoUrlStore from './shorten/MongoUrlStore';
+import InMemoryShortenerStore, {
+	InMemoryConfig,
+} from './shorten/stores/InMemoryShortenerStore';
+import MongoUrlStore, { MongoDbConfig } from './shorten/stores/MongoUrlStore';
 
 export let logger: ILogger = console;
 
 export interface ContainerConfig {
 	logLevel?: LogLevel;
-	storeType?: StoreType;
+	store?: DBConfig;
 }
 
 export interface Container {
@@ -15,19 +17,19 @@ export interface Container {
 	store: ShortenerStore;
 }
 
+export type DBConfig = MongoDbConfig | InMemoryConfig;
+
 export default async function (config?: ContainerConfig): Promise<Container> {
 	logger = new ConsoleLogger(config?.logLevel ?? LogLevel.None);
-	const store = await createStore(config?.storeType);
+	const store = await createStore(config?.store);
 
 	return { logger, store };
 }
 
-type StoreType = 'In memory' | 'MongoDB';
-
-function createStore(type?: StoreType): Promise<ShortenerStore> {
-	switch (type) {
-		case 'MongoDB':
-			return MongoUrlStore.create();
+function createStore(config?: DBConfig): Promise<ShortenerStore> {
+	switch (config?.type) {
+		case 'MongoDb':
+			return MongoUrlStore.create(config);
 
 		case 'In memory':
 		default:
