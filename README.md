@@ -1,6 +1,8 @@
 # URL Shortener
 
-App to shorten URLs.
+![Build](https://github.com/OliverFlecke/url-shortener/actions/workflows/main.yml/badge.svg)
+
+App to shorten URLs, build with NodeJS with a MongoDB backend, using NextJS and TypeScript.
 
 ## Development
 
