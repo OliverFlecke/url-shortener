@@ -9,7 +9,11 @@ const Layout = function ({ Component, pageProps }: AppProps) {
 		<>
 			<Head>
 				<meta charSet="utf-8" />
+				<title>Shorten URL</title>
+				<meta name="description" content="URL Shortener" />
+				<link rel="manifest" href="/manifest.json" />
 				<link rel="icon" href="/favicon.ico" />
+				<link rel="apple-touch-icon" href="/logo192.png" />
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<meta
 					name="theme-color"
@@ -21,9 +25,6 @@ const Layout = function ({ Component, pageProps }: AppProps) {
 					media="(prefers-color-scheme: dark)"
 					content={sky[900]}
 				/>
-				<meta name="description" content="URL Shortener" />
-				<link rel="apple-touch-icon" href="/logo192.png" />
-				{/* <link rel="manifest" href="/manifest.json" /> */}
 				<meta name="color-scheme" content="dark light" />
 			</Head>
 			<main className="min-h-screen h-full bg-gradient-to-b dark:to-gray-900 dark:from-sky-900 from-gray-100 to-sky-600">
