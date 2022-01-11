@@ -7,8 +7,6 @@ async function checkToken(access_token: string): Promise<number> {
 	const client_secret = process.env.GITHUB_CLIENT_SECRET;
 	const auth = Buffer.from(`${client_id}:${client_secret}`).toString('base64');
 
-	logger.debug(`Client id: ${client_id}`);
-
 	const response = await fetch(
 		`https://api.github.com/applications/${client_id}/token`,
 		{
@@ -80,7 +78,6 @@ export async function checkUser(
 ) {
 	request.locals = request.locals ?? {};
 	const token = request.cookies.GITHUB_TOKEN;
-	logger.debug(`Token: ${token}`);
 
 	try {
 		if (request.cookies.GITHUB_TOKEN !== undefined) {
