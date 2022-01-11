@@ -4,7 +4,7 @@ import { URL } from 'url';
 
 import createApp from '../server/api';
 import { mockAuth } from './mocks/auth';
-import { randomString } from './rand';
+import { randomString, randomUserId } from './rand';
 
 describe('GET /s/:slug', () => {
 	test('unable to find key', async () => {
@@ -164,5 +164,86 @@ describe('POST /s/ with authentication', () => {
 			name,
 			userId,
 		});
+	});
+});
+
+describe('GET /s/', () => {
+	test('returns urls created by the logged in user', async () => {
+		const userId = Math.floor(Math.random() * 10000);
+		const name = randomString();
+		const url = new URL('https://example.com');
+		const { app, store } = await createApp({
+			app: express().use(mockAuth(userId)),
+		});
+
+		// Add url for logged in user
+		const entity = await store.addRedirect(name, url, { userId });
+
+		const res = await request(app).get('/s?private').expect(200);
+
+		expect(res.body).toEqual([
+			{
+				...entity,
+				createdOn: expect.any(String),
+			},
+		]);
+	});
+
+	test('returns urls created by the logged in user, but not other users', async () => {
+		const userId = randomUserId();
+		const name = randomString();
+		const url = new URL('https://example.com');
+		const { app, store } = await createApp({
+			app: express().use(mockAuth(userId)),
+		});
+
+		// Add url for other users
+		for (let index = 0; index < 10; index++) {
+			await store.addRedirect(randomString(), url, {
+				userId: randomUserId(),
+			});
+		}
+
+		// Add url for logged in user
+		const entity = await store.addRedirect(name, url, { userId });
+
+		const res = await request(app).get('/s?private').expect(200);
+
+		expect(res.body).toEqual([
+			{
+				...entity,
+				createdOn: expect.any(String),
+			},
+		]);
+	});
+
+	test('logged in user should be able to get all public urls', async () => {
+		const userId = randomUserId();
+		const name = randomString();
+		const url = new URL('https://example.com');
+		const { app, store } = await createApp({
+			app: express().use(mockAuth(userId)),
+		});
+
+		// Add public urls
+		const names = new Array(10).fill(undefined).map((_) => randomString());
+		for (const name of names) {
+			await store.addRedirect(name, url, {});
+		}
+
+		// Add url for logged in user
+		const entry = await store.addRedirect(name, url, { userId });
+
+		const res = await request(app).get('/s').expect(200);
+
+		expect(res.body).toEqual(
+			names.map((name) => ({
+				name,
+				url: url.toString(),
+				createdOn: expect.any(String),
+			}))
+		);
+		expect(res.body.find((x: any) => x.name == name)).toBeUndefined();
+		expect(await store.lookup(name)).toEqual(entry);
 	});
 });

@@ -7,3 +7,7 @@ export function randomString(length: number = 8): string {
 		.map((_) => chars.charAt(Math.floor(Math.random() * chars.length)))
 		.join('');
 }
+
+export function randomUserId(): number {
+	return Math.floor(Math.random() * 1000000);
+}

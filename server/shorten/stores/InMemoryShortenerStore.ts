@@ -10,8 +10,9 @@ export interface InMemoryConfig extends DbStore {
 export default class InMemoryShortenerStore implements ShortenerStore {
 	data: { [key: string]: ShortenedUrl } = {};
 
-	get(): Promise<ShortenedUrl[]> {
+	get(userId?: number): Promise<ShortenedUrl[]> {
 		const urls = Object.values(this.data)
+			.filter((x) => x.userId === userId)
 			.sort(
 				(a: ShortenedUrl, b: ShortenedUrl) =>
 					a.createdOn.getTime() - b.createdOn.getTime()

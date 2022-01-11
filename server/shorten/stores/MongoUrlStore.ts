@@ -38,8 +38,8 @@ export default class MongoUrlStore implements ShortenerStore {
 		}
 	}
 
-	async get(): Promise<ShortenedUrl[]> {
-		const urls = await this.urls.find({}).limit(50).toArray();
+	async get(userId?: number): Promise<ShortenedUrl[]> {
+		const urls = await this.urls.find({ userId }).limit(50).toArray();
 
 		return Promise.resolve(urls);
 	}

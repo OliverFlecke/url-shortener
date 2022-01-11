@@ -6,7 +6,7 @@ export interface ShortenedUrlOptions {
 }
 
 export interface ShortenerStore {
-	get: () => Promise<ShortenedUrl[]>;
+	get: (userId?: number) => Promise<ShortenedUrl[]>;
 	lookup: (key: string) => Promise<ShortenedUrl | null>;
 	addRedirect: (
 		key: string,

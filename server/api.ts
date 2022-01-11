@@ -63,9 +63,11 @@ function createApp(app?: Express): Express {
 	app
 		.route('/s/')
 		.get(async (request: Request, response: Response) => {
-			logger.debug(`Getting urls for user: ${request.locals.userId}`);
+			logger.trace(`Getting urls for user: ${request.locals.userId}`);
 
-			const urls = await container.store.get();
+			const urls = await container.store.get(
+				request.query.private === undefined ? undefined : request.locals.userId
+			);
 
 			if (urls.length === 0) {
 				response.sendStatus(204);
