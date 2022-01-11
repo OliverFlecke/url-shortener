@@ -49,7 +49,7 @@ app
 	})
 	.post(async (req: Request, res: Response) => {
 		const name = req.params.slug;
-		logger.trace(`Request to add '${name}' -> '${req.body}'`);
+		logger.log(`Request to add '${name}' -> '${req.body}'`);
 		await addRedirect(name, req, res);
 	});
 
@@ -68,7 +68,7 @@ app
 	})
 	.post(async (req: Request, res: Response) => {
 		const name = randomString(8);
-		logger.trace(`Request to add '${name}' -> '${req.body}'`);
+		logger.log(`No name given. Request to add '${name}' -> '${req.body}'`);
 		await addRedirect(name, req, res);
 	});
 

@@ -1,7 +1,8 @@
 import React, { useCallback, useRef } from 'react';
 
 async function saveUrl(url: URL, key?: string): Promise<void> {
-	await fetch(`s/${key ?? 'aaa'}`, {
+	const endpoint = key ? `/s/${key}` : '/s/';
+	await fetch(endpoint, {
 		method: 'POST',
 		body: url.toString(),
 	});
