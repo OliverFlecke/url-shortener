@@ -1,19 +1,16 @@
 import { NextFunction, Response } from 'express';
-import {
-	GITHUB_CLIENT_ID,
-	GITHUB_CLIENT_SECRET,
-	GITHUB_REDIRECT_URI,
-} from './config';
 import { logger } from './container';
 import Request from './Request';
 
-export async function checkToken(access_token: string): Promise<number> {
-	const auth = Buffer.from(
-		`${GITHUB_CLIENT_ID}:${GITHUB_CLIENT_SECRET}`
-	).toString('base64');
+async function checkToken(access_token: string): Promise<number> {
+	const client_id = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
+	const client_secret = process.env.GITHUB_CLIENT_SECRET;
+	const auth = Buffer.from(`${client_id}:${client_secret}`).toString('base64');
 
-	const res = await fetch(
-		`https://api.github.com/applications/${GITHUB_CLIENT_ID}/token`,
+	logger.debug(`Client id: ${client_id}`);
+
+	const response = await fetch(
+		`https://api.github.com/applications/${client_id}/token`,
 		{
 			method: 'POST',
 			headers: {
@@ -27,16 +24,18 @@ export async function checkToken(access_token: string): Promise<number> {
 		}
 	);
 
-	if (res.status === 200) {
-		const json = await res.json();
+	if (response.status === 200) {
+		const json = await response.json();
 		return Promise.resolve(json.user.id);
 	} else {
+		logger.warn('Provided token is not valid');
+		logger.warn(await response.text());
 		return Promise.reject();
 	}
 }
 
 export async function authCallback(request: Request, response: Response) {
-	logger.trace('Callback from github auth');
+	logger.log('Callback from github auth');
 	const code = request.query.code;
 
 	const githubResponse = await fetch(
@@ -48,9 +47,9 @@ export async function authCallback(request: Request, response: Response) {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
-				client_id: GITHUB_CLIENT_ID,
-				client_secret: GITHUB_CLIENT_SECRET,
-				redirect_uri: GITHUB_REDIRECT_URI,
+				client_id: process.env.GITHUB_CLIENT_ID,
+				client_secret: process.env.GITHUB_CLIENT_SECRET,
+				redirect_uri: process.env.GITHUB_REDIRECT_URI,
 				code,
 			}),
 		}
@@ -76,22 +75,23 @@ export async function authCallback(request: Request, response: Response) {
 
 export async function checkUser(
 	request: Request,
-	response: Response,
+	_: Response,
 	next: NextFunction
 ) {
+	request.locals = request.locals ?? {};
+	const token = request.cookies.GITHUB_TOKEN;
+	logger.debug(`Token: ${token}`);
+
 	try {
-		const token = request.cookies.GITHUB_TOKEN;
-		const userId = await checkToken(token);
-		logger.trace(`Authenticated user '${userId}'`);
+		if (request.cookies.GITHUB_TOKEN !== undefined) {
+			const userId = await checkToken(token);
+			logger.debug(`Authenticated user '${userId}'`);
 
-		request.locals = {
-			isAuthorized: true,
-			userId,
-		};
-
+			request.locals.isAuthorized = true;
+			request.locals.userId = userId;
+		}
 		next();
 	} catch (err) {
-		logger.error(err);
-		response.sendStatus(403);
+		next();
 	}
 }

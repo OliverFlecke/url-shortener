@@ -1,10 +1,14 @@
 import React, { useCallback, useRef } from 'react';
-import { GITHUB_CLIENT_ID, GITHUB_REDIRECT_URI } from '../server/config';
 import AddUrlForm from '../src/components/AddUrlForm';
 import ShortenedUrlList, {
 	ShortenedUrlListFuncs,
 } from '../src/components/ShortenedUrlList';
 import { randomString } from '../tests/rand';
+
+const GITHUB_CLIENT_ID = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
+const GITHUB_REDIRECT_URI = process.env.NEXT_PUBLIC_GITHUB_REDIRECT_ID;
+const baseUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${GITHUB_REDIRECT_URI}`;
+const url = `${baseUrl}&state=${randomString(16)}`;
 
 export default function Home() {
 	const listRef = useRef<ShortenedUrlListFuncs>(null);
@@ -12,9 +16,6 @@ export default function Home() {
 		() => listRef.current?.refresh() ?? Promise.resolve(),
 		[]
 	);
-
-	const state = randomString(16);
-	const url = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${GITHUB_REDIRECT_URI}&state=${state}`;
 
 	return (
 		<>

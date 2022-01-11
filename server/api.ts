@@ -1,7 +1,8 @@
 import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 import express, { Response } from 'express';
 import { randomString } from '../tests/rand';
-import { authCallback } from './auth';
+import { authCallback, checkUser } from './auth';
 import configureContainer, {
 	Container,
 	ContainerConfig,
@@ -13,7 +14,7 @@ let container: Container;
 
 const app = express();
 
-app.use(bodyParser.text());
+app.use(bodyParser.text()).use(cookieParser());
 
 async function addRedirect(
 	name: string,
@@ -54,13 +55,15 @@ app
 
 app
 	.route('/s/')
-	.get(async (_: Request, res: Response) => {
+	.get(checkUser, async (request: Request, response: Response) => {
+		logger.debug(`Getting urls for user: ${request.locals.userId}`);
+
 		const urls = await container.store.get();
 
 		if (urls.length === 0) {
-			res.sendStatus(204);
+			response.sendStatus(204);
 		} else {
-			res.json(urls);
+			response.json(urls);
 		}
 	})
 	.post(async (req: Request, res: Response) => {
