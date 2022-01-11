@@ -2,7 +2,13 @@ import { NextFunction, Response } from 'express';
 import { logger } from './container';
 import Request from './Request';
 
-async function checkToken(access_token: string): Promise<number> {
+export interface User {
+	login: string;
+	id: number;
+	avatar_url: string;
+}
+
+async function checkToken(access_token: string): Promise<User> {
 	const client_id = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID;
 	const client_secret = process.env.GITHUB_CLIENT_SECRET;
 	const auth = Buffer.from(`${client_id}:${client_secret}`).toString('base64');
@@ -24,7 +30,7 @@ async function checkToken(access_token: string): Promise<number> {
 
 	if (response.status === 200) {
 		const json = await response.json();
-		return Promise.resolve(json.user.id);
+		return Promise.resolve(json.user);
 	} else {
 		logger.warn('Provided token is not valid');
 		logger.warn(await response.text());
@@ -45,9 +51,9 @@ export async function authCallback(request: Request, response: Response) {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
-				client_id: process.env.GITHUB_CLIENT_ID,
+				redirect_uri: process.env.NEXT_PUBLIC_GITHUB_REDIRECT_URI,
+				client_id: process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID,
 				client_secret: process.env.GITHUB_CLIENT_SECRET,
-				redirect_uri: process.env.GITHUB_REDIRECT_URI,
 				code,
 			}),
 		}
@@ -57,10 +63,16 @@ export async function authCallback(request: Request, response: Response) {
 	const token = json.access_token;
 
 	try {
-		await checkToken(token);
+		const user = await checkToken(token);
+
 		response
 			.cookie('GITHUB_TOKEN', token, {
 				httpOnly: true,
+				secure: true,
+				sameSite: 'strict',
+			})
+			.cookie('USER', JSON.stringify(user), {
+				httpOnly: false,
 				secure: true,
 				sameSite: 'strict',
 			})
@@ -81,11 +93,11 @@ export async function checkUser(
 
 	try {
 		if (request.cookies.GITHUB_TOKEN !== undefined) {
-			const userId = await checkToken(token);
-			logger.trace(`Authenticated user '${userId}'`);
+			const user = await checkToken(token);
+			logger.trace(`Authenticated user '${JSON.stringify(user.login)}'`);
 
 			request.locals.isAuthorized = true;
-			request.locals.userId = userId;
+			request.locals.userId = user.id;
 		}
 		next();
 	} catch (err) {

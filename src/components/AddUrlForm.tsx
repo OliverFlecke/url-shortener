@@ -49,7 +49,6 @@ const AddUrlForm: React.FC<{ refresh?: () => Promise<void> }> = ({
 
 	return (
 		<div className="flex flex-col items-center px-4">
-			<h2 className="pt-4 text-center text-3xl md:text-4xl">Shorten URL</h2>
 			<label className="styled">
 				<span>Short name</span>
 				<input

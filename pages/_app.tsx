@@ -4,7 +4,7 @@ import React from 'react';
 import 'src/compiled.css';
 import { sky } from 'tailwindcss/colors';
 
-const Layout = function ({ Component, pageProps }: AppProps) {
+export default function App({ Component, pageProps }: AppProps) {
 	return (
 		<>
 			<Head>
@@ -32,6 +32,4 @@ const Layout = function ({ Component, pageProps }: AppProps) {
 			</main>
 		</>
 	);
-};
-
-export default Layout;
+}
