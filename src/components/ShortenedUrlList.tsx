@@ -10,20 +10,6 @@ import ShortenedUrl from '../models/ShortenedUrl';
 import Icon from './Icon';
 import Tooltip from './Tooltip';
 
-/**
- * Pure component to render a list of shortened URLs.
- */
-const ShortenedUrlList: React.FC<{
-	urls: ShortenedUrl[];
-}> = ({ urls }) => (
-	<div className="max-w-full flex flex-col items-center pb-4 m-4 sm:m-0">
-		<div className="w-full max-w-lg">
-			<h3 className="text-xl">Active links</h3>
-			{urls.length === 0 ? <NoLinks /> : <List urls={urls} />}
-		</div>
-	</div>
-);
-
 const NoLinks: React.FC = () => (
 	<span className="text-secondary">No active links</span>
 );
@@ -72,13 +58,14 @@ const UrlRow: React.FC<{ url: ShortenedUrl }> = ({ url }) => {
  */
 const ShortenedUrlListContainer = forwardRef((_, ref) => {
 	const [urls, setUrls] = useState<ShortenedUrl[]>([]);
+	const [shouldGetUsersUrls, setShouldGetUsersUrls] = useState<boolean>(false);
 
 	const getUrls = useCallback(async () => {
-		const res = await fetch('/s/');
+		const res = await fetch(shouldGetUsersUrls ? '/s?private' : '/s/');
 		if (res.status === 200) {
 			setUrls(await res.json());
 		}
-	}, [setUrls]);
+	}, [setUrls, shouldGetUsersUrls]);
 
 	useImperativeHandle(
 		ref,
@@ -90,9 +77,22 @@ const ShortenedUrlListContainer = forwardRef((_, ref) => {
 
 	useEffect(() => {
 		getUrls();
-	}, [getUrls]);
+	}, [getUrls, shouldGetUsersUrls]);
 
-	return <ShortenedUrlList urls={urls} />;
+	return (
+		<div className="max-w-full flex flex-col items-center pb-4 m-4 sm:m-0">
+			<div className="w-full max-w-lg">
+				<h3 className="text-xl">Active links</h3>
+				<button
+					onClick={() => setShouldGetUsersUrls((x) => !x)}
+					className="btn"
+				>
+					{shouldGetUsersUrls ? 'Private URLs' : 'Public URLs'}
+				</button>
+				{urls.length === 0 ? <NoLinks /> : <List urls={urls} />}
+			</div>
+		</div>
+	);
 });
 ShortenedUrlListContainer.displayName = 'ShortenedUrlListContainer';
 

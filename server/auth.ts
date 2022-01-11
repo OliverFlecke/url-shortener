@@ -82,7 +82,7 @@ export async function checkUser(
 	try {
 		if (request.cookies.GITHUB_TOKEN !== undefined) {
 			const userId = await checkToken(token);
-			logger.debug(`Authenticated user '${userId}'`);
+			logger.trace(`Authenticated user '${userId}'`);
 
 			request.locals.isAuthorized = true;
 			request.locals.userId = userId;
