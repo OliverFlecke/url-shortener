@@ -1,11 +1,13 @@
 import bodyParser from 'body-parser';
-import express, { Request, Response } from 'express';
+import express, { Response } from 'express';
 import { randomString } from '../tests/rand';
+import { authCallback } from './auth';
 import configureContainer, {
 	Container,
 	ContainerConfig,
 	logger,
 } from './container';
+import Request from './Request';
 
 let container: Container;
 
@@ -66,6 +68,8 @@ app
 		logger.trace(`Request to add '${name}' -> '${req.body}'`);
 		await addRedirect(name, req, res);
 	});
+
+app.route('/github-callback').get(authCallback);
 
 export default async (config?: ContainerConfig) => {
 	container = await configureContainer(config);
