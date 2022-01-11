@@ -1,5 +1,5 @@
 import { Collection, MongoClient } from 'mongodb';
-import { ShortenerStore } from '..';
+import { ShortenedUrlOptions, ShortenerStore } from '..';
 import ShortenedUrl from '../../../src/models/ShortenedUrl';
 import { logger } from '../../container';
 import DbStore from './DbStore';
@@ -49,8 +49,13 @@ export default class MongoUrlStore implements ShortenerStore {
 		return Promise.resolve(url);
 	}
 
-	async addRedirect(key: string, url: URL): Promise<ShortenedUrl> {
+	async addRedirect(
+		key: string,
+		url: URL,
+		options?: ShortenedUrlOptions
+	): Promise<ShortenedUrl> {
 		const entry: ShortenedUrl = {
+			...options,
 			name: key,
 			url: url.toString(),
 			createdOn: new Date(Date.now()),

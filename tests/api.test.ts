@@ -1,6 +1,9 @@
+import express from 'express';
 import request from 'supertest';
 import { URL } from 'url';
+
 import createApp from '../server/api';
+import { mockAuth } from './mocks/auth';
 import { randomString } from './rand';
 
 describe('GET /s/:slug', () => {
@@ -114,5 +117,52 @@ describe('GET /s/', () => {
 				createdOn: expect.any(String),
 			}))
 		);
+	});
+});
+
+describe('POST /s/ with authentication', () => {
+	test('create link as signed in user', async () => {
+		const userId = Math.floor(Math.random() * 10000);
+		const { app, store } = await createApp({
+			app: express().use(mockAuth(userId)),
+		});
+		const name = 'xyz';
+		const url = new URL('https://example.com');
+
+		await request(app)
+			.post(`/s/${name}`)
+			.set('Content-Type', 'text/plain')
+			.send(url.toString())
+			.expect(200);
+
+		expect(await store.lookup(name)).toEqual({
+			createdOn: expect.any(Date),
+			url: url.toString(),
+			name,
+			userId,
+		});
+	});
+
+	test('create link as signed in user without a name', async () => {
+		const userId = Math.floor(Math.random() * 10000);
+		const { app, store } = await createApp({
+			app: express().use(mockAuth(userId)),
+		});
+		const url = new URL('https://example.com');
+
+		const res = await request(app)
+			.post(`/s/`)
+			.set('Content-Type', 'text/plain')
+			.send(url.toString())
+			.expect(200);
+
+		const name = JSON.parse(res.text).name;
+
+		expect(await store.lookup(name)).toEqual({
+			createdOn: expect.any(Date),
+			url: url.toString(),
+			name,
+			userId,
+		});
 	});
 });

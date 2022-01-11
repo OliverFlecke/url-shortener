@@ -1,4 +1,4 @@
-import { ShortenerStore } from '..';
+import { ShortenedUrlOptions, ShortenerStore } from '..';
 import ShortenedUrl from '../../../src/models/ShortenedUrl';
 import { logger } from '../../container';
 import DbStore from './DbStore';
@@ -35,9 +35,14 @@ export default class InMemoryShortenerStore implements ShortenerStore {
 		}
 	}
 
-	addRedirect(key: string, url: URL): Promise<ShortenedUrl> {
+	addRedirect(
+		key: string,
+		url: URL,
+		options?: ShortenedUrlOptions
+	): Promise<ShortenedUrl> {
 		logger.log(`Adding mapping: '${key}' -> '${url}'`);
 		const entry = {
+			...options,
 			name: key,
 			url: url.toString(),
 			createdOn: new Date(Date.now()),
