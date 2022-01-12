@@ -14,19 +14,52 @@ export interface MongoDbConfig extends DbStore {
 const port = 27017;
 const defaultUrl = `mongodb://localhost:${port}`;
 
+const urlCollectionName = 'urls';
+
 export default class MongoUrlStore implements ShortenerStore {
 	private client: MongoClient;
 	private db: string;
 	private logger?: ILogger;
 
 	private get urls(): Collection<ShortenedUrl> {
-		return this.client.db(this.db).collection<ShortenedUrl>('urls');
+		return this.client.db(this.db).collection<ShortenedUrl>(urlCollectionName);
 	}
 
 	constructor(client: MongoClient, db: string = 'main', logger?: ILogger) {
 		this.client = client;
 		this.db = db;
 		this.logger = logger;
+
+		this.client.db(this.db).createCollection(urlCollectionName, {
+			validator: {
+				$jsonSchema: {
+					bsonType: 'object',
+					required: ['name', 'url', 'createdOn'],
+					properties: {
+						name: {
+							bsonType: 'string',
+							description: 'must be a string and is required',
+						},
+						url: {
+							bsonType: 'string',
+							description: 'must be a valid URL',
+						},
+						userId: {
+							bsonType: 'int',
+							description: 'optional user id of the user which own this url',
+						},
+						createdOn: {
+							bsonType: 'date',
+							description: 'date which this URL is created on',
+						},
+						expiresOn: {
+							bsonType: 'date',
+							description: 'optional date when the URL expires',
+						},
+					},
+				},
+			},
+		});
 	}
 
 	async close() {

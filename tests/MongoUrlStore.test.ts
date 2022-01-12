@@ -1,6 +1,6 @@
 import { Db, MongoClient, ObjectId } from 'mongodb';
 import MongoUrlStore from '../server/shorten/stores/MongoUrlStore';
-import { randomString, randomURL, randomUserId } from './rand';
+import { randomDate, randomString, randomURL, randomUserId } from './rand';
 
 const config = global as any;
 
@@ -98,6 +98,7 @@ describe('Get urls', () => {
 			const urls = new Array(20).fill(undefined).map((_) => ({
 				name: randomString(),
 				url: randomURL().toString(),
+				createdOn: randomDate(),
 			}));
 
 			await db.collection('urls').insertMany(urls);
@@ -121,11 +122,13 @@ describe('Get urls', () => {
 			const userUrls = new Array(20).fill(undefined).map((_) => ({
 				name: randomString(),
 				url: randomURL().toString(),
+				createdOn: randomDate(),
 				userId,
 			}));
 			const urls = new Array(20).fill(undefined).map((_) => ({
 				name: randomString(),
 				url: randomURL().toString(),
+				createdOn: randomDate(),
 			}));
 			await db.collection('urls').insertMany(userUrls);
 			await db.collection('urls').insertMany(urls);

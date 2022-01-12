@@ -15,3 +15,7 @@ export function randomUserId(): number {
 export function randomURL(): URL {
 	return new URL(`https://${randomString()}.com`);
 }
+
+export function randomDate(): Date {
+	return new Date(Math.random() * 1000000);
+}
