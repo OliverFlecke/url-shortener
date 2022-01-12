@@ -10,6 +10,7 @@ import ShortenedUrl from '../models/ShortenedUrl';
 import Icon from './common/Icon';
 import { Selector } from './common/Selector';
 import Tooltip from './common/Tooltip';
+import { Spinner } from './common/Spinner';
 
 type LinkType = 'All' | 'Private';
 
@@ -94,11 +95,11 @@ const UrlRow: React.FC<{
  * @returns A React component with a list of shortened URLs.
  */
 const ShortenedUrlListContainer = forwardRef((_, ref) => {
-	const [urls, setUrls] = useState<ShortenedUrl[]>([]);
+	const [urls, setUrls] = useState<ShortenedUrl[] | null>(null);
 	const [urlType, setUrlType] = useState<LinkType>('All');
 
 	const getUrls = useCallback(async () => {
-		setUrls([]);
+		setUrls(null);
 		const res = await fetch(urlType === 'Private' ? '/s?private' : '/s/');
 		if (res.status === 200) {
 			setUrls(await res.json());
@@ -126,7 +127,12 @@ const ShortenedUrlListContainer = forwardRef((_, ref) => {
 					selected={urlType}
 					setState={setUrlType}
 				/>
-				{urls.length === 0 ? (
+
+				{urls === null ? (
+					<div className="w-full flex justify-center py-4">
+						<Spinner />
+					</div>
+				) : urls.length === 0 ? (
 					<NoLinks />
 				) : (
 					<List urls={urls} urlType={urlType} refresh={getUrls} />
