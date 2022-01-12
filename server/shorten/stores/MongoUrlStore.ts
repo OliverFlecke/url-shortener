@@ -18,19 +18,30 @@ const urlCollectionName = 'urls';
 
 export default class MongoUrlStore implements ShortenerStore {
 	private client: MongoClient;
-	private db: string;
+	private dbName: string;
 	private logger?: ILogger;
 
 	private get urls(): Collection<ShortenedUrl> {
-		return this.client.db(this.db).collection<ShortenedUrl>(urlCollectionName);
+		return this.client
+			.db(this.dbName)
+			.collection<ShortenedUrl>(urlCollectionName);
 	}
 
-	constructor(client: MongoClient, db: string = 'main', logger?: ILogger) {
+	constructor(client: MongoClient, db: string, logger?: ILogger) {
 		this.client = client;
-		this.db = db;
+		this.dbName = db;
 		this.logger = logger;
+	}
 
-		this.client.db(this.db).createCollection(urlCollectionName, {
+	async close() {
+		await this.client.close();
+	}
+
+	private static async setupCollection(
+		client: MongoClient,
+		dbName: string
+	): Promise<void> {
+		await client.db(dbName).createCollection(urlCollectionName, {
 			validator: {
 				$jsonSchema: {
 					bsonType: 'object',
@@ -60,11 +71,10 @@ export default class MongoUrlStore implements ShortenerStore {
 				},
 			},
 		});
-		this.urls.createIndex({ name: 1 }, { unique: true });
-	}
-
-	async close() {
-		await this.client.close();
+		await client
+			.db(dbName)
+			.collection(urlCollectionName)
+			.createIndex({ name: 1 }, { unique: true });
 	}
 
 	/**
@@ -73,8 +83,10 @@ export default class MongoUrlStore implements ShortenerStore {
 	 * @throws If unable to connect to a MongoDB at the provided URI.
 	 * @returns A `MongoUrlStore` connected to the provided URI.
 	 */
-	static async create(uri?: string, db?: string, logger?: ILogger) {
+	static async create(uri?: string, dbName?: string, logger?: ILogger) {
 		const url = uri ?? defaultUrl;
+		dbName = dbName ?? 'main';
+
 		try {
 			const client = await MongoClient.connect(url, {
 				serverSelectionTimeoutMS:
@@ -82,7 +94,15 @@ export default class MongoUrlStore implements ShortenerStore {
 			});
 			logger?.log('Connected to database');
 
-			return new MongoUrlStore(client, db);
+			const collections = await client
+				.db(dbName)
+				.listCollections({ name: 'urls' })
+				.toArray();
+			if (collections.length === 0) {
+				this.setupCollection(client, dbName);
+			}
+
+			return new MongoUrlStore(client, dbName);
 		} catch (err) {
 			logger?.error(`Unable to connect to MongoDB: ${err}`);
 			throw err;

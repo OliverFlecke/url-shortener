@@ -7,7 +7,7 @@ export interface NavProps {
 	client_id?: string;
 	redirect_uri?: string;
 	state?: string;
-	user?: User;
+	user: User | null;
 }
 
 export default function Nav({
@@ -20,7 +20,7 @@ export default function Nav({
 		<nav className="w-full flex justify-center">
 			<h1 className="pt-4 text-center text-3xl md:text-4xl">Shorten URL</h1>
 			<div className="absolute right-0">
-				{user === undefined ? (
+				{user === null ? (
 					<LoginButton
 						client_id={client_id}
 						redirect_uri={redirect_uri}

@@ -31,7 +31,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 			state: randomString(16),
 			user:
 				context.req.cookies.USER === undefined
-					? undefined
+					? null
 					: JSON.parse(context.req.cookies.USER),
 		},
 	};
