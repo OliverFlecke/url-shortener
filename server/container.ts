@@ -21,15 +21,22 @@ export type DBConfig = MongoDbConfig | InMemoryConfig;
 
 export default async function (config?: ContainerConfig): Promise<Container> {
 	logger = new ConsoleLogger(config?.logLevel ?? LogLevel.None);
-	const store = await createStore(config?.store);
+	const store = await createStore(logger, config?.store);
 
 	return { logger, store };
 }
 
-function createStore(config?: DBConfig): Promise<ShortenerStore> {
+function createStore(
+	logger: ILogger,
+	config?: DBConfig
+): Promise<ShortenerStore> {
 	switch (config?.type) {
 		case 'MongoDb':
-			return MongoUrlStore.create(config);
+			return MongoUrlStore.create(
+				`mongodb://${config.host}:${config.port}`,
+				config.db,
+				logger
+			);
 
 		case 'In memory':
 		default:

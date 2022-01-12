@@ -1,13 +1,14 @@
 import { Collection, MongoClient } from 'mongodb';
 import { ShortenedUrlOptions, ShortenerStore } from '..';
 import ShortenedUrl from '../../../src/models/ShortenedUrl';
-import { logger } from '../../container';
+import { ILogger } from '../../logger';
 import DbStore from './DbStore';
 
 export interface MongoDbConfig extends DbStore {
 	type: 'MongoDb';
 	host: string;
 	port: number;
+	db?: string;
 }
 
 const port = 27017;
@@ -15,25 +16,32 @@ const defaultUrl = `mongodb://localhost:${port}`;
 
 export default class MongoUrlStore implements ShortenerStore {
 	private client: MongoClient;
+	private db: string;
+	private logger?: ILogger;
 
 	private get urls(): Collection<ShortenedUrl> {
-		return this.client.db('main').collection<ShortenedUrl>('urls');
+		return this.client.db(this.db).collection<ShortenedUrl>('urls');
 	}
 
-	constructor(client: MongoClient) {
+	constructor(client: MongoClient, db: string = 'main', logger?: ILogger) {
 		this.client = client;
+		this.db = db;
+		this.logger = logger;
 	}
 
-	static async create(config?: MongoDbConfig) {
-		const url = config ? `mongodb://${config.host}:${config.port}` : defaultUrl;
-		try {
-			logger.debug(`Connecting to ${url}`);
-			const client = await MongoClient.connect(url);
-			logger.log('Connected to database');
+	async close() {
+		await this.client.close();
+	}
 
-			return new MongoUrlStore(client);
+	static async create(uri?: string, db?: string, logger?: ILogger) {
+		const url = uri ?? defaultUrl;
+		try {
+			const client = await MongoClient.connect(url);
+			logger?.log('Connected to database');
+
+			return new MongoUrlStore(client, db);
 		} catch (err) {
-			logger.error(`Unable to connect to MongoDB: ${err}`);
+			logger?.error(`Unable to connect to MongoDB: ${err}`);
 			throw err;
 		}
 	}
@@ -45,8 +53,7 @@ export default class MongoUrlStore implements ShortenerStore {
 	}
 
 	async lookup(key: string): Promise<ShortenedUrl | null> {
-		const url = await this.urls.findOne({ name: key });
-		return Promise.resolve(url);
+		return await this.urls.findOne({ name: key });
 	}
 
 	async addRedirect(
@@ -54,6 +61,7 @@ export default class MongoUrlStore implements ShortenerStore {
 		url: URL,
 		options?: ShortenedUrlOptions
 	): Promise<ShortenedUrl> {
+		this.logger?.trace(`Adding redirect from '${key}' -> '${url.toString()}'`);
 		const entry: ShortenedUrl = {
 			...options,
 			name: key,

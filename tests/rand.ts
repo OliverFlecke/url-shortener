@@ -11,3 +11,7 @@ export function randomString(length: number = 8): string {
 export function randomUserId(): number {
 	return Math.floor(Math.random() * 1000000);
 }
+
+export function randomURL(): URL {
+	return new URL(`https://${randomString()}.com`);
+}
