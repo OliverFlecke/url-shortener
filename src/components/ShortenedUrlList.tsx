@@ -57,8 +57,8 @@ const UrlRow: React.FC<{
 
 	return (
 		<li className="rounded-md bg-green-800 p-4 flex flex-col justify-between items-center">
-			<span className="flex w-full justify-between space-x-2 sm:w-auto">
-				<span>{shortUrl}</span>
+			<span className="flex w-full justify-between space-x-2 sm:w-auto text-white">
+				<span className="">{shortUrl}</span>
 				<div className="flex flex-row space-x-4">
 					<button
 						onClick={copyUrl}
@@ -66,19 +66,19 @@ const UrlRow: React.FC<{
 						className="flex items-center"
 					>
 						<Tooltip>
-							<Icon icon={copy} />
+							<Icon icon={copy} className="text-current" />
 							<Tooltip.Text>Copy to clipboard</Tooltip.Text>
 						</Tooltip>
 					</button>
 					<button onClick={deleteUrl} aria-label="Delete url">
 						<Icon
 							icon={trash}
-							className={urlType === 'Private' ? '' : 'hidden'}
+							className={urlType === 'Private' ? 'text-current' : 'hidden'}
 						/>
 					</button>
 				</div>
 			</span>
-			<Icon icon={arrowDown} />
+			<Icon icon={arrowDown} className="text-white" />
 			<a href={url.url.toString()} className="underline text-sky-300">
 				{url.url.toString()}
 			</a>
