@@ -4,18 +4,32 @@ import { randomString, randomURL, randomUserId } from './rand';
 
 const config = global as any;
 
+async function withStore(
+	testMethod: (store: MongoUrlStore, db: Db) => Promise<void>
+) {
+	const dbName = randomString(32);
+	const store = await MongoUrlStore.create(config.__MONGO_URI__, dbName);
+	const client = await MongoClient.connect(config.__MONGO_URI__);
+	const db = await client.db(dbName);
+
+	try {
+		await testMethod(store, db);
+	} finally {
+		await store.close();
+		await client.close();
+	}
+}
+
 describe('Store add redirect', () => {
 	let store: MongoUrlStore;
 	let db: Db;
 	let client: MongoClient;
 
 	beforeAll(async () => {
-		store = await MongoUrlStore.create(
-			config.__MONGO_URI__,
-			config.__MONGO_DB_NAME__
-		);
+		const dbName = randomString(32);
+		store = await MongoUrlStore.create(config.__MONGO_URI__, dbName);
 		client = await MongoClient.connect(config.__MONGO_URI__);
-		db = await client.db(config.__MONGO_DB_NAME__);
+		db = await client.db(dbName);
 	});
 
 	afterAll(async () => {
@@ -25,7 +39,7 @@ describe('Store add redirect', () => {
 
 	test('insert one URL into the collection', async () => {
 		const name = randomString();
-		const url = new URL('https://example.com');
+		const url = randomURL();
 
 		// Act
 		await store.addRedirect(name, url);
@@ -42,7 +56,7 @@ describe('Store add redirect', () => {
 	test('insert one URL into the collection for a user', async () => {
 		const userId = randomUserId();
 		const name = randomString();
-		const url = new URL('https://example.com');
+		const url = randomURL();
 
 		// Act
 		await store.addRedirect(name, url, { userId });
@@ -75,5 +89,77 @@ describe('Store add redirect', () => {
 			url: url.toString(),
 			createdOn: expect.any(Date),
 		});
+	});
+});
+
+describe('Get urls', () => {
+	test('get all URLs', async () => {
+		await withStore(async (store, db) => {
+			const urls = new Array(20).fill(undefined).map((_) => ({
+				name: randomString(),
+				url: randomURL().toString(),
+			}));
+
+			await db.collection('urls').insertMany(urls);
+
+			// Act
+			const entries = await store.get();
+
+			expect(entries).toHaveLength(urls.length);
+			expect(entries).toEqual(
+				urls.map((x) => ({
+					_id: expect.any(ObjectId),
+					...x,
+				}))
+			);
+		});
+	});
+
+	test('get urls only for user', async () => {
+		await withStore(async (store, db) => {
+			const userId = randomUserId();
+			const userUrls = new Array(20).fill(undefined).map((_) => ({
+				name: randomString(),
+				url: randomURL().toString(),
+				userId,
+			}));
+			const urls = new Array(20).fill(undefined).map((_) => ({
+				name: randomString(),
+				url: randomURL().toString(),
+			}));
+			await db.collection('urls').insertMany(userUrls);
+			await db.collection('urls').insertMany(urls);
+
+			// Act
+			const entries = await store.get(userId);
+
+			expect(entries).toHaveLength(userUrls.length);
+			expect(entries).toEqual(
+				userUrls.map((x) => ({
+					_id: expect.any(ObjectId),
+					...x,
+				}))
+			);
+		});
+	});
+});
+
+describe('MongoUrlStore setup', () => {
+	test('invalid url to db should throw', async () => {
+		try {
+			await MongoUrlStore.create(randomString());
+			fail();
+		} catch (e) {
+			expect(e).toBeDefined();
+		}
+	});
+
+	test('create without url should fail (no connection available during test)', async () => {
+		try {
+			await MongoUrlStore.create();
+			fail();
+		} catch (e) {
+			expect(e).toBeDefined();
+		}
 	});
 });

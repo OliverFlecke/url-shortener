@@ -36,7 +36,10 @@ export default class MongoUrlStore implements ShortenerStore {
 	static async create(uri?: string, db?: string, logger?: ILogger) {
 		const url = uri ?? defaultUrl;
 		try {
-			const client = await MongoClient.connect(url);
+			const client = await MongoClient.connect(url, {
+				serverSelectionTimeoutMS:
+					process.env.NODE_ENV === 'production' ? undefined : 100,
+			});
 			logger?.log('Connected to database');
 
 			return new MongoUrlStore(client, db);
