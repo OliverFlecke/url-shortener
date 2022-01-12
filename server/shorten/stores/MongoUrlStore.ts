@@ -67,6 +67,12 @@ export default class MongoUrlStore implements ShortenerStore {
 		await this.client.close();
 	}
 
+	/**
+	 * Create an instance of this store, connected to the provided URI and database.
+	 *
+	 * @throws If unable to connect to a MongoDB at the provided URI.
+	 * @returns A `MongoUrlStore` connected to the provided URI.
+	 */
 	static async create(uri?: string, db?: string, logger?: ILogger) {
 		const url = uri ?? defaultUrl;
 		try {
@@ -94,19 +100,26 @@ export default class MongoUrlStore implements ShortenerStore {
 	}
 
 	async addRedirect(
-		key: string,
+		name: string,
 		url: URL,
 		options?: ShortenedUrlOptions
 	): Promise<ShortenedUrl> {
-		this.logger?.trace(`Adding redirect from '${key}' -> '${url.toString()}'`);
+		this.logger?.trace(`Adding redirect from '${name}' -> '${url.toString()}'`);
 		const entry: ShortenedUrl = {
 			...options,
-			name: key,
+			name,
 			url: url.toString(),
 			createdOn: new Date(Date.now()),
 		};
 		await this.urls.insertOne(entry);
 
 		return Promise.resolve(entry);
+	}
+
+	async remove(name: string, userId: number): Promise<boolean> {
+		this.logger?.trace(`Removing '${name}' by user '${userId}'`);
+
+		const result = await this.urls.deleteOne({ name, userId });
+		return result.acknowledged && result.deletedCount !== 0;
 	}
 }

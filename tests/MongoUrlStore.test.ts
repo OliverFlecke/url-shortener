@@ -1,3 +1,4 @@
+import { fail } from 'assert';
 import { Db, MongoClient, ObjectId } from 'mongodb';
 import MongoUrlStore from '../server/shorten/stores/MongoUrlStore';
 import { randomDate, randomString, randomURL, randomUserId } from './rand';
@@ -189,4 +190,36 @@ describe('MongoUrlStore setup', () => {
 			expect(e).toBeDefined();
 		}
 	});
+});
+
+describe('Delete urls', () => {
+	test('user deletes an URL they own', async () =>
+		await withStore(async (store, db) => {
+			const name = randomString();
+			const userId = randomUserId();
+			await store.addRedirect(name, randomURL(), { userId });
+
+			await store.remove(name, userId);
+
+			expect(await db.collection('urls').findOne({ name })).toBeNull();
+		}));
+
+	test('user cannot delete url owned by another user', async () =>
+		await withStore(async (store, db) => {
+			const name = randomString();
+			const userId = randomUserId();
+			const otherUserId = randomUserId();
+
+			await store.addRedirect(name, randomURL(), { userId });
+			expect(await store.remove(name, otherUserId)).toBeFalsy();
+
+			expect(await db.collection('urls').findOne({ name })).not.toBeNull();
+			expect(await db.collection('urls').findOne({ name })).toEqual({
+				name,
+				userId,
+				url: expect.any(String),
+				_id: expect.any(ObjectId),
+				createdOn: expect.any(Date),
+			});
+		}));
 });
