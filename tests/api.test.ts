@@ -4,7 +4,8 @@ import { URL } from 'url';
 
 import createApp from '../server/api';
 import { mockAuth } from './mocks/auth';
-import { randomString, randomUserId } from './rand';
+import { withStore } from './mocks/mongoDb';
+import { randomString, randomURL, randomUserId } from './rand';
 
 describe('GET /s/:slug', () => {
 	test('unable to find key', async () => {
@@ -246,4 +247,81 @@ describe('GET /s/', () => {
 		expect(res.body.find((x: any) => x.name == name)).toBeUndefined();
 		expect(await store.lookup(name)).toEqual(entry);
 	});
+});
+
+describe('DELETE /s/:slug', () => {
+	test('user deletes one of their URLs', async () =>
+		await withStore(async (store, _) => {
+			const name = randomString();
+			const userId = randomUserId();
+			const { app } = await createApp({
+				app: express().use(mockAuth(userId)),
+				store,
+			});
+
+			await store.addRedirect(name, randomURL(), { userId });
+
+			// Act
+			await request(app).delete(`/s/${name}`).expect(200);
+
+			expect(await store.lookup(name)).toBeNull();
+		}));
+
+	test('user cannot delete public URL', async () =>
+		await withStore(async (store, _) => {
+			const name = randomString();
+			const userId = randomUserId();
+			const { app } = await createApp({
+				app: express().use(mockAuth(userId)),
+				store,
+			});
+
+			await store.addRedirect(name, randomURL());
+
+			// Act
+			await request(app)
+				.delete(`/s/${name}`)
+				.expect(403)
+				.expect('User is not authorized to delete this URL');
+
+			expect(await store.lookup(name)).not.toBeNull();
+		}));
+
+	test("user cannot delete other user's URL", async () =>
+		await withStore(async (store, _) => {
+			const name = randomString();
+			const userId = randomUserId();
+			const { app } = await createApp({
+				app: express().use(mockAuth(userId)),
+				store,
+			});
+
+			await store.addRedirect(name, randomURL(), { userId: randomUserId() });
+
+			// Act
+			await request(app)
+				.delete(`/s/${name}`)
+				.expect(403)
+				.expect('User is not authorized to delete this URL');
+
+			expect(await store.lookup(name)).not.toBeNull();
+		}));
+
+	test('unauthorized user cannot delete URL', async () =>
+		await withStore(async (store, _) => {
+			const name = randomString();
+			const { app } = await createApp({
+				store,
+			});
+
+			await store.addRedirect(name, randomURL());
+
+			// Act
+			await request(app)
+				.delete(`/s/${name}`)
+				.expect(403)
+				.expect('User is not authorized to delete this URL');
+
+			expect(await store.lookup(name)).not.toBeNull();
+		}));
 });

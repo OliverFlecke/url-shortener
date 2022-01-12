@@ -9,10 +9,9 @@ import configureContainer, {
 	logger,
 } from './container';
 import Request from './Request';
+import { ShortenerStore } from './shorten';
 
-let container: Container;
-
-function createApp(app?: Express): Express {
+function createApp(container: Container, app?: Express): Express {
 	app = app ?? express();
 
 	app.use(bodyParser.text()).use(cookieParser());
@@ -58,6 +57,19 @@ function createApp(app?: Express): Express {
 			const name = req.params.slug;
 
 			await addRedirect(name, req, res);
+		})
+		.delete(async (request: Request, response: Response) => {
+			if (
+				request.locals.isAuthorized &&
+				(await container.store.remove(
+					request.params.slug,
+					request.locals.userId
+				))
+			) {
+				response.sendStatus(200);
+			} else {
+				response.status(403).send('User is not authorized to delete this URL');
+			}
 		});
 
 	app
@@ -87,12 +99,16 @@ function createApp(app?: Express): Express {
 
 interface ServerConfig extends ContainerConfig {
 	app?: Express;
+	store?: ShortenerStore;
 }
 
 export default async (config?: ServerConfig) => {
-	container = await configureContainer(config);
+	const container = await configureContainer(config);
+	if (config?.store) {
+		container.store = config?.store;
+	}
 
-	const app = createApp(config?.app);
+	const app = createApp(container, config?.app);
 
 	return { app, ...container };
 };

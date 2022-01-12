@@ -9,7 +9,7 @@ export let logger: ILogger = console;
 
 export interface ContainerConfig {
 	logLevel?: LogLevel;
-	store?: DBConfig;
+	storeOptions?: DBConfig;
 }
 
 export interface Container {
@@ -21,7 +21,7 @@ export type DBConfig = MongoDbConfig | InMemoryConfig;
 
 export default async function (config?: ContainerConfig): Promise<Container> {
 	logger = new ConsoleLogger(config?.logLevel ?? LogLevel.None);
-	const store = await createStore(logger, config?.store);
+	const store = await createStore(logger, config?.storeOptions);
 
 	return { logger, store };
 }

@@ -1,25 +1,10 @@
 import { fail } from 'assert';
 import { Db, MongoClient, ObjectId } from 'mongodb';
 import MongoUrlStore from '../server/shorten/stores/MongoUrlStore';
+import { withStore } from './mocks/mongoDb';
 import { randomDate, randomString, randomURL, randomUserId } from './rand';
 
 const config = global as any;
-
-async function withStore(
-	testMethod: (store: MongoUrlStore, db: Db) => Promise<void>
-) {
-	const dbName = randomString(32);
-	const store = await MongoUrlStore.create(config.__MONGO_URI__, dbName);
-	const client = await MongoClient.connect(config.__MONGO_URI__);
-	const db = await client.db(dbName);
-
-	try {
-		await testMethod(store, db);
-	} finally {
-		await store.close();
-		await client.close();
-	}
-}
 
 describe('Store add redirect', () => {
 	let store: MongoUrlStore;

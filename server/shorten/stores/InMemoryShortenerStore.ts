@@ -52,4 +52,8 @@ export default class InMemoryShortenerStore implements ShortenerStore {
 
 		return Promise.resolve(entry);
 	}
+
+	remove(_name: string, _userId: number): Promise<boolean> {
+		return Promise.resolve(false);
+	}
 }

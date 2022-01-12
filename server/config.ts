@@ -44,6 +44,6 @@ function parseLogLevel(env: NodeJS.ProcessEnv): LogLevel {
 export function parseConfig(env: NodeJS.ProcessEnv): ContainerConfig {
 	return {
 		logLevel: parseLogLevel(env),
-		store: readDbConfig(env),
+		storeOptions: readDbConfig(env),
 	};
 }
