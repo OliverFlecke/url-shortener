@@ -60,6 +60,7 @@ export default class MongoUrlStore implements ShortenerStore {
 				},
 			},
 		});
+		this.urls.createIndex({ name: 1 }, { unique: true });
 	}
 
 	async close() {

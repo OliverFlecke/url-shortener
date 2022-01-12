@@ -90,6 +90,30 @@ describe('Store add redirect', () => {
 			createdOn: expect.any(Date),
 		});
 	});
+
+	test('insert with same name should fail', async () => {
+		const name = randomString();
+		const url = randomURL();
+		await store.addRedirect(name, url);
+
+		// Act
+		try {
+			await store.addRedirect(name, url);
+			fail();
+		} catch (e) {
+			expect(e).toBeDefined();
+		}
+
+		expect(await store.lookup(name)).toEqual({
+			_id: expect.any(ObjectId),
+			createdOn: expect.any(Date),
+			name,
+			url: url.toString(),
+		});
+		expect(await db.collection('urls').find({ name }).toArray()).toHaveLength(
+			1
+		);
+	});
 });
 
 describe('Get urls', () => {
