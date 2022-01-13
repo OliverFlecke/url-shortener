@@ -59,8 +59,8 @@ const UrlRow: React.FC<{
 
 	return (
 		<li className="rounded-md bg-green-800 p-4 flex flex-col justify-between items-center">
-			<span className="flex w-full justify-between space-x-2 sm:w-auto text-white">
-				<span className="">{shortUrl}</span>
+			<span className="flex w-full justify-between space-x-4 sm:w-auto text-white">
+				<span>{shortUrl}</span>
 				<div className="flex flex-row space-x-4">
 					<button
 						onClick={copyUrl}
@@ -75,13 +75,13 @@ const UrlRow: React.FC<{
 					<button onClick={deleteUrl} aria-label="Delete url">
 						<Icon
 							icon={trash}
-							className={urlType === 'Private' ? 'text-current' : 'hidden'}
+							className={urlType === 'Private' ? 'text-red-500' : 'hidden'}
 						/>
 					</button>
 				</div>
 			</span>
 			<Icon icon={arrowDown} className="text-white" />
-			<a href={url.url.toString()} className="underline text-sky-300">
+			<a href={url.url.toString()} className="underline text-sky-200">
 				{url.url.toString()}
 			</a>
 		</li>
@@ -127,7 +127,7 @@ const ShortenedUrlListContainer = forwardRef((_, ref) => {
 	return (
 		<div className="max-w-full flex flex-col items-center pb-4 m-4 sm:m-0">
 			<div className="w-full max-w-lg">
-				<h3 className="text-xl">Active links</h3>
+				<h2 className="text-xl">Active links</h2>
 				{isAuthorized && (
 					<Selector
 						options={['All', 'Private']}

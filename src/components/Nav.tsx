@@ -31,7 +31,11 @@ export default function Nav({ client_id, redirect_uri, state }: NavProps) {
 
 const UserView: React.FC<{ user: User }> = ({ user }) => (
 	<>
-		<img src={user.avatar_url} className="rounded-full w-12 m-4" />
+		<img
+			src={user.avatar_url}
+			alt={`Avatar of user ${user.login}`}
+			className="rounded-full w-12 m-4"
+		/>
 	</>
 );
 

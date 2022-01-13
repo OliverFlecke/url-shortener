@@ -5,10 +5,7 @@ const Icon: React.FC<{ icon: string; className?: string }> = ({
 	className,
 }) => (
 	<span
-		className={
-			'inline-block w-6 text-black dark:text-white' +
-			(className ? ` ${className}` : '')
-		}
+		className={'inline-block w-6' + (className ? ` ${className}` : '')}
 		dangerouslySetInnerHTML={{
 			__html: icon.replace('data:image/svg+xml;utf8,', ''),
 		}}
