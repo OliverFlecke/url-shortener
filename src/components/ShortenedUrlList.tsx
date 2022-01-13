@@ -2,6 +2,7 @@ import { arrowDown, copy, trash } from 'ionicons/icons';
 import React, {
 	forwardRef,
 	useCallback,
+	useContext,
 	useEffect,
 	useImperativeHandle,
 	useState,
@@ -11,6 +12,7 @@ import Icon from './common/Icon';
 import { Selector } from './common/Selector';
 import Tooltip from './common/Tooltip';
 import { Spinner } from './common/Spinner';
+import UserContext from '../contexts/UserContext';
 
 type LinkType = 'All' | 'Private';
 
@@ -118,15 +120,19 @@ const ShortenedUrlListContainer = forwardRef((_, ref) => {
 		getUrls();
 	}, [getUrls, urlType]);
 
+	const { isAuthorized } = useContext(UserContext);
+
 	return (
 		<div className="max-w-full flex flex-col items-center pb-4 m-4 sm:m-0">
 			<div className="w-full max-w-lg">
 				<h3 className="text-xl">Active links</h3>
-				<Selector
-					options={['All', 'Private']}
-					selected={urlType}
-					setState={setUrlType}
-				/>
+				{isAuthorized && (
+					<Selector
+						options={['All', 'Private']}
+						selected={urlType}
+						setState={setUrlType}
+					/>
+				)}
 
 				{urls === null ? (
 					<div className="w-full flex justify-center py-4">

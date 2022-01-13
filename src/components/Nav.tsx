@@ -1,25 +1,20 @@
-import { GetStaticProps } from 'next';
-import React from 'react';
+import React, { useContext } from 'react';
 import { User } from '../../server/auth';
-import { randomString } from '../../tests/rand';
+import UserContext from '../contexts/UserContext';
 
 export interface NavProps {
 	client_id?: string;
 	redirect_uri?: string;
 	state?: string;
-	user: User | null;
 }
 
-export default function Nav({
-	user,
-	client_id,
-	redirect_uri,
-	state,
-}: NavProps) {
+export default function Nav({ client_id, redirect_uri, state }: NavProps) {
+	const { user } = useContext(UserContext);
+
 	return (
 		<nav className="w-full flex justify-center">
 			<h1 className="pt-4 text-center text-3xl md:text-4xl">Shorten URL</h1>
-			<div className="absolute right-0">
+			<div className="absolute right-0 top-0">
 				{user === null ? (
 					<LoginButton
 						client_id={client_id}
@@ -33,16 +28,6 @@ export default function Nav({
 		</nav>
 	);
 }
-
-export const getStaticProps: GetStaticProps = async (_) => {
-	return {
-		props: {
-			client_id: process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID,
-			redirect_uri: process.env.NEXT_PUBLIC_GITHUB_REDIRECT_URI,
-			state: randomString(16),
-		},
-	};
-};
 
 const UserView: React.FC<{ user: User }> = ({ user }) => (
 	<>
@@ -58,7 +43,7 @@ const LoginButton: React.FC<{
 	const url = `https://github.com/login/oauth/authorize?client_id=${client_id}&redirect_uri=${redirect_uri}&state=${state}`;
 
 	return (
-		<a href={url} className="decoration-transparent p-4">
+		<a href={url} className="btn btn-green inline-block m-2">
 			Login
 		</a>
 	);

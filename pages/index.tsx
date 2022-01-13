@@ -1,13 +1,22 @@
 import { GetServerSideProps } from 'next';
 import React, { useCallback, useRef } from 'react';
+import { User } from '../server/auth';
 import AddUrlForm from '../src/components/AddUrlForm';
-import Nav, { NavProps } from '../src/components/Nav';
+import Nav from '../src/components/Nav';
 import ShortenedUrlList, {
 	ShortenedUrlListFuncs,
 } from '../src/components/ShortenedUrlList';
+import UserContext from '../src/contexts/UserContext';
 import { randomString } from '../tests/rand';
 
-export default function Home(props: NavProps) {
+interface Props {
+	client_id?: string;
+	redirect_uri?: string;
+	state?: string;
+	user: User | null;
+}
+
+export default function Home(props: Props) {
 	const listRef = useRef<ShortenedUrlListFuncs>(null);
 	const refresh = useCallback(
 		() => listRef.current?.refresh() ?? Promise.resolve(),
@@ -16,9 +25,13 @@ export default function Home(props: NavProps) {
 
 	return (
 		<>
-			<Nav {...props} />
-			<AddUrlForm refresh={refresh} />
-			<ShortenedUrlList ref={listRef} />
+			<UserContext.Provider
+				value={{ isAuthorized: props.user !== null, user: props.user }}
+			>
+				<Nav {...props} />
+				<AddUrlForm refresh={refresh} />
+				<ShortenedUrlList ref={listRef} />
+			</UserContext.Provider>
 		</>
 	);
 }
