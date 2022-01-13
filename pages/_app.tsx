@@ -12,7 +12,8 @@ export default function App({ Component, pageProps }: AppProps) {
 				<title>Shorten URL</title>
 				<meta name="description" content="URL Shortener" />
 				<link rel="manifest" href="/manifest.json" />
-				<link rel="icon" href="/favicon.ico" />
+				<link rel="icon" href="/favicon.ico" sizes="any" />
+				<link rel="icon" href="/favicon.ico" type="image/svg+xml" />
 				<link rel="apple-touch-icon" href="/logo192.png" />
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<meta
