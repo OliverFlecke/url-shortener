@@ -105,6 +105,8 @@ const ShortenedUrlListContainer = forwardRef((_, ref) => {
 		const res = await fetch(urlType === 'Private' ? '/s?private' : '/s/');
 		if (res.status === 200) {
 			setUrls(await res.json());
+		} else if (res.status === 204) {
+			setUrls([]);
 		}
 	}, [setUrls, urlType]);
 
