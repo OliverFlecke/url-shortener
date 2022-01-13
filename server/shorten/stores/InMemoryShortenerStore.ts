@@ -1,4 +1,4 @@
-import { ShortenerStore } from '..';
+import { ShortenedUrlOptions, ShortenerStore } from '..';
 import ShortenedUrl from '../../../src/models/ShortenedUrl';
 import { logger } from '../../container';
 import DbStore from './DbStore';
@@ -10,8 +10,9 @@ export interface InMemoryConfig extends DbStore {
 export default class InMemoryShortenerStore implements ShortenerStore {
 	data: { [key: string]: ShortenedUrl } = {};
 
-	get(): Promise<ShortenedUrl[]> {
+	get(userId?: number): Promise<ShortenedUrl[]> {
 		const urls = Object.values(this.data)
+			.filter((x) => x.userId === userId)
 			.sort(
 				(a: ShortenedUrl, b: ShortenedUrl) =>
 					a.createdOn.getTime() - b.createdOn.getTime()
@@ -35,9 +36,14 @@ export default class InMemoryShortenerStore implements ShortenerStore {
 		}
 	}
 
-	addRedirect(key: string, url: URL): Promise<ShortenedUrl> {
+	addRedirect(
+		key: string,
+		url: URL,
+		options?: ShortenedUrlOptions
+	): Promise<ShortenedUrl> {
 		logger.log(`Adding mapping: '${key}' -> '${url}'`);
 		const entry = {
+			...options,
 			name: key,
 			url: url.toString(),
 			createdOn: new Date(Date.now()),
@@ -45,5 +51,9 @@ export default class InMemoryShortenerStore implements ShortenerStore {
 		this.data[key] = entry;
 
 		return Promise.resolve(entry);
+	}
+
+	remove(_name: string, _userId: number): Promise<boolean> {
+		return Promise.resolve(false);
 	}
 }

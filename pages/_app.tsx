@@ -4,7 +4,7 @@ import React from 'react';
 import 'src/compiled.css';
 import { sky } from 'tailwindcss/colors';
 
-const Layout = function ({ Component, pageProps }: AppProps) {
+export default function App({ Component, pageProps }: AppProps) {
 	return (
 		<>
 			<Head>
@@ -12,7 +12,8 @@ const Layout = function ({ Component, pageProps }: AppProps) {
 				<title>Shorten URL</title>
 				<meta name="description" content="URL Shortener" />
 				<link rel="manifest" href="/manifest.json" />
-				<link rel="icon" href="/favicon.ico" />
+				<link rel="icon" href="/favicon.ico" sizes="any" />
+				<link rel="icon" href="/favicon.ico" type="image/svg+xml" />
 				<link rel="apple-touch-icon" href="/logo192.png" />
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<meta
@@ -32,6 +33,4 @@ const Layout = function ({ Component, pageProps }: AppProps) {
 			</main>
 		</>
 	);
-};
-
-export default Layout;
+}

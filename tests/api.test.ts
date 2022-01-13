@@ -1,7 +1,11 @@
+import express from 'express';
 import request from 'supertest';
 import { URL } from 'url';
+
 import createApp from '../server/api';
-import { randomString } from './rand';
+import { mockAuth } from './mocks/auth';
+import { withStore } from './mocks/mongoDb';
+import { randomString, randomURL, randomUserId } from './rand';
 
 describe('GET /s/:slug', () => {
 	test('unable to find key', async () => {
@@ -115,4 +119,209 @@ describe('GET /s/', () => {
 			}))
 		);
 	});
+});
+
+describe('POST /s/ with authentication', () => {
+	test('create link as signed in user', async () => {
+		const userId = Math.floor(Math.random() * 10000);
+		const { app, store } = await createApp({
+			app: express().use(mockAuth(userId)),
+		});
+		const name = 'xyz';
+		const url = new URL('https://example.com');
+
+		await request(app)
+			.post(`/s/${name}`)
+			.set('Content-Type', 'text/plain')
+			.send(url.toString())
+			.expect(200);
+
+		expect(await store.lookup(name)).toEqual({
+			createdOn: expect.any(Date),
+			url: url.toString(),
+			name,
+			userId,
+		});
+	});
+
+	test('create link as signed in user without a name', async () => {
+		const userId = Math.floor(Math.random() * 10000);
+		const { app, store } = await createApp({
+			app: express().use(mockAuth(userId)),
+		});
+		const url = new URL('https://example.com');
+
+		const res = await request(app)
+			.post(`/s/`)
+			.set('Content-Type', 'text/plain')
+			.send(url.toString())
+			.expect(200);
+
+		const name = JSON.parse(res.text).name;
+
+		expect(await store.lookup(name)).toEqual({
+			createdOn: expect.any(Date),
+			url: url.toString(),
+			name,
+			userId,
+		});
+	});
+});
+
+describe('GET /s/', () => {
+	test('returns urls created by the logged in user', async () => {
+		const userId = Math.floor(Math.random() * 10000);
+		const name = randomString();
+		const url = new URL('https://example.com');
+		const { app, store } = await createApp({
+			app: express().use(mockAuth(userId)),
+		});
+
+		// Add url for logged in user
+		const entity = await store.addRedirect(name, url, { userId });
+
+		const res = await request(app).get('/s?private').expect(200);
+
+		expect(res.body).toEqual([
+			{
+				...entity,
+				createdOn: expect.any(String),
+			},
+		]);
+	});
+
+	test('returns urls created by the logged in user, but not other users', async () => {
+		const userId = randomUserId();
+		const name = randomString();
+		const url = new URL('https://example.com');
+		const { app, store } = await createApp({
+			app: express().use(mockAuth(userId)),
+		});
+
+		// Add url for other users
+		for (let index = 0; index < 10; index++) {
+			await store.addRedirect(randomString(), url, {
+				userId: randomUserId(),
+			});
+		}
+
+		// Add url for logged in user
+		const entity = await store.addRedirect(name, url, { userId });
+
+		const res = await request(app).get('/s?private').expect(200);
+
+		expect(res.body).toEqual([
+			{
+				...entity,
+				createdOn: expect.any(String),
+			},
+		]);
+	});
+
+	test('logged in user should be able to get all public urls', async () => {
+		const userId = randomUserId();
+		const name = randomString();
+		const url = new URL('https://example.com');
+		const { app, store } = await createApp({
+			app: express().use(mockAuth(userId)),
+		});
+
+		// Add public urls
+		const names = new Array(10).fill(undefined).map((_) => randomString());
+		for (const name of names) {
+			await store.addRedirect(name, url, {});
+		}
+
+		// Add url for logged in user
+		const entry = await store.addRedirect(name, url, { userId });
+
+		const res = await request(app).get('/s').expect(200);
+
+		expect(res.body).toEqual(
+			names.map((name) => ({
+				name,
+				url: url.toString(),
+				createdOn: expect.any(String),
+			}))
+		);
+		expect(res.body.find((x: any) => x.name == name)).toBeUndefined();
+		expect(await store.lookup(name)).toEqual(entry);
+	});
+});
+
+describe('DELETE /s/:slug', () => {
+	test('user deletes one of their URLs', async () =>
+		await withStore(async (store, _) => {
+			const name = randomString();
+			const userId = randomUserId();
+			const { app } = await createApp({
+				app: express().use(mockAuth(userId)),
+				store,
+			});
+
+			await store.addRedirect(name, randomURL(), { userId });
+
+			// Act
+			await request(app).delete(`/s/${name}`).expect(200);
+
+			expect(await store.lookup(name)).toBeNull();
+		}));
+
+	test('user cannot delete public URL', async () =>
+		await withStore(async (store, _) => {
+			const name = randomString();
+			const userId = randomUserId();
+			const { app } = await createApp({
+				app: express().use(mockAuth(userId)),
+				store,
+			});
+
+			await store.addRedirect(name, randomURL());
+
+			// Act
+			await request(app)
+				.delete(`/s/${name}`)
+				.expect(403)
+				.expect('User is not authorized to delete this URL');
+
+			expect(await store.lookup(name)).not.toBeNull();
+		}));
+
+	test("user cannot delete other user's URL", async () =>
+		await withStore(async (store, _) => {
+			const name = randomString();
+			const userId = randomUserId();
+			const { app } = await createApp({
+				app: express().use(mockAuth(userId)),
+				store,
+			});
+
+			await store.addRedirect(name, randomURL(), { userId: randomUserId() });
+
+			// Act
+			await request(app)
+				.delete(`/s/${name}`)
+				.expect(403)
+				.expect('User is not authorized to delete this URL');
+
+			expect(await store.lookup(name)).not.toBeNull();
+		}));
+
+	test('unauthorized user cannot delete URL', async () =>
+		await withStore(async (store, _) => {
+			const name = randomString();
+			const { app } = await createApp({
+				store,
+			});
+
+			await store.addRedirect(name, randomURL());
+
+			// Act
+			await request(app)
+				.delete(`/s/${name}`)
+				.expect(403)
+				.expect('User is not authorized to delete this URL');
+
+			expect(await store.lookup(name)).not.toBeNull();
+		}));
 });

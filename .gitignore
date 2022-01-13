@@ -1,4 +1,6 @@
 **/compiled.css
+.env
+globalConfig.json
 
 # dependencies
 /node_modules
